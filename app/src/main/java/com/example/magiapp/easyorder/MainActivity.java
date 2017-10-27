@@ -117,11 +117,12 @@ public class MainActivity extends AppCompatActivity {
                                        public void onDataClicked(int rowIndex, Object clickedData) {
                                            final FoodItem rowData = (FoodItem) clickedData;
                                            Toast.makeText(MainActivity.this, "U clicked" + rowData.getName(), Toast.LENGTH_SHORT).show();
+                                           int currentQty = rowData.getQuantity();
 
                                              final MaterialNumberPicker numberPicker = new MaterialNumberPicker.Builder(MainActivity.this)
                                                    .minValue(0)
                                                    .maxValue(10)
-                                                   .defaultValue(0)
+                                                   .defaultValue(currentQty)
                                                    .backgroundColor(Color.WHITE)
                                                    .separatorColor(Color.TRANSPARENT)
                                                    .textColor(Color.BLACK)
@@ -131,14 +132,14 @@ public class MainActivity extends AppCompatActivity {
                                                    .build();
 
                                            AlertDialog.Builder amountPickerDialog = new AlertDialog.Builder(MainActivity.this);
-                                           amountPickerDialog.setTitle("Select Amount");
+                                           amountPickerDialog.setTitle("Select "+ rowData.getName() + " quantity");
                                            amountPickerDialog.setView(numberPicker);
                                            amountPickerDialog.setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() {
                                                        @Override
                                                        public void onClick(DialogInterface dialog, int which) {
                                                            Toast.makeText(getApplicationContext(),"You Picked " + numberPicker.getValue(), Toast.LENGTH_SHORT).show();
                                                            rowData.setQuantity(numberPicker.getValue());
-                                                           table.invalidate();
+                                                           foodItemTableDataAdapter.notifyDataSetChanged();
                                                            //Snackbar.make(findViewById(R.id.), "You picked : " + numberPicker.getValue(), Snackbar.LENGTH_LONG).show();
                                                        }
                                                    })
