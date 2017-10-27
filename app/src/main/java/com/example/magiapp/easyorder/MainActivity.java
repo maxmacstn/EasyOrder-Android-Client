@@ -1,48 +1,38 @@
 package com.example.magiapp.easyorder;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.ObbInfo;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.StrictMode;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import biz.kasual.materialnumberpicker.MaterialNumberPicker;
 import de.codecrafters.tableview.TableView;
 import de.codecrafters.tableview.listeners.TableDataClickListener;
 import de.codecrafters.tableview.model.TableColumnWeightModel;
-import de.codecrafters.tableview.toolkit.SimpleTableDataAdapter;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 
 
 public class MainActivity extends AppCompatActivity {
 
 
-    private static final String[][] DATA_TO_SHOW = {{"001", "Rice", "20฿"}, {"002", "Apple Juice", "50฿"}, {"003", "Rice", "20฿"}, {"004", "Apple Juice", "50฿"},
-            {"005", "Rice", "20฿"}, {"006", "Apple Juice", "50฿"}, {"007", "Rice", "20฿"}, {"008", "Apple Juice", "50฿"},
-            {"009", "Rice", "20฿"}, {"010", "Apple Juice", "50฿"}, {"011", "Rice", "20฿"}, {"012", "Apple Juice", "50฿"},
-            {"013", "Rice", "20฿"}, {"014", "Apple Juice", "50฿"}, {"015", "Rice", "20฿"}, {"016", "Apple Juice", "50฿"}};
     private static final String[] TABLE_HEADERS = {"Type","ID", "Name", "Price","Qty."};
     TextView connectStatus;
     TableView table;
+    FoodItemTableDataAdapter foodItemTableDataAdapter;
+    Button submit;
+    List menuList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,12 +40,21 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         table = (TableView<String>) findViewById(R.id.foodTable);
-
+        submit = (Button) findViewById(R.id.b_submit);
         connectStatus = (TextView) findViewById(R.id.tv_connectStatus_main);
+        menuList = MenuMaker.createFoodMenuList();
         setSupportActionBar(toolbar);
         initTable();
 
-
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ConfirmOrderActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("menuList",((ArrayList)menuList));
+                startActivity(intent);
+            }
+        });
 
 
 /*
@@ -101,83 +100,60 @@ public class MainActivity extends AppCompatActivity {
 
     private void initTable() {
         TableColumnWeightModel columnModel = new TableColumnWeightModel(5);
-        columnModel.setColumnWeight(0, 1);
+        columnModel.setColumnWeight(0, 2);
         columnModel.setColumnWeight(1, 1);
-        columnModel.setColumnWeight(2, 3);
+        columnModel.setColumnWeight(2, 4);
         columnModel.setColumnWeight(3, 2);
         columnModel.setColumnWeight(4, 2);
         table.setColumnModel(columnModel);
         table.setHeaderAdapter(new SimpleTableHeaderAdapter(this, TABLE_HEADERS));
-        final FoodItemTableDataAdapter foodItemTableDataAdapter = new FoodItemTableDataAdapter(this,MenuMaker.createFoodMenuList(),table);
+        foodItemTableDataAdapter = new FoodItemTableDataAdapter(this,menuList,table);
         table.setDataAdapter(foodItemTableDataAdapter);
+        table.addDataClickListener(new ClickedTableRow());
 
+    }
 
-        table.addDataClickListener(new TableDataClickListener() {
-                                       @Override
-                                       public void onDataClicked(int rowIndex, Object clickedData) {
-                                           final FoodItem rowData = (FoodItem) clickedData;
-                                           Toast.makeText(MainActivity.this, "U clicked" + rowData.getName(), Toast.LENGTH_SHORT).show();
-                                           int currentQty = rowData.getQuantity();
+    /**
+     * Display number picker after clicked a table row
+     * and update FoodItem object quantity according to the data that previously picked from the DataPicker
+     *
+     */
 
-                                             final MaterialNumberPicker numberPicker = new MaterialNumberPicker.Builder(MainActivity.this)
-                                                   .minValue(0)
-                                                   .maxValue(10)
-                                                   .defaultValue(currentQty)
-                                                   .backgroundColor(Color.WHITE)
-                                                   .separatorColor(Color.TRANSPARENT)
-                                                   .textColor(Color.BLACK)
-                                                   .textSize(20)
-                                                   .enableFocusability(false)
-                                                   .wrapSelectorWheel(true)
-                                                   .build();
+    private class ClickedTableRow implements TableDataClickListener{
+        @Override
+        public void onDataClicked(int rowIndex, Object clickedData) {
+            final FoodItem rowData = (FoodItem) clickedData;
+            //Toast.makeText(MainActivity.this, "U clicked" + rowData.getName(), Toast.LENGTH_SHORT).show();
+            int currentQty = rowData.getQuantity();
 
-                                           AlertDialog.Builder amountPickerDialog = new AlertDialog.Builder(MainActivity.this);
-                                           amountPickerDialog.setTitle("Select "+ rowData.getName() + " quantity");
-                                           amountPickerDialog.setView(numberPicker);
-                                           amountPickerDialog.setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() {
-                                                       @Override
-                                                       public void onClick(DialogInterface dialog, int which) {
-                                                           Toast.makeText(getApplicationContext(),"You Picked " + numberPicker.getValue(), Toast.LENGTH_SHORT).show();
-                                                           rowData.setQuantity(numberPicker.getValue());
-                                                           foodItemTableDataAdapter.notifyDataSetChanged();
-                                                           //Snackbar.make(findViewById(R.id.), "You picked : " + numberPicker.getValue(), Snackbar.LENGTH_LONG).show();
-                                                       }
-                                                   })
-                                                   .show();
+            final MaterialNumberPicker numberPicker = new MaterialNumberPicker.Builder(MainActivity.this)
+                    .minValue(0)
+                    .maxValue(10)
+                    .defaultValue(currentQty)
+                    .backgroundColor(Color.WHITE)
+                    .separatorColor(Color.TRANSPARENT)
+                    .textColor(Color.BLACK)
+                    .textSize(20)
+                    .enableFocusability(false)
+                    .wrapSelectorWheel(true)
+                    .build();
 
-                                            /*
-                                           AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                                           builder.setMessage("รับขนมจีบซาลาเปาเพิ่มมั้ยครับ?");
-                                           builder.setPositiveButton("รับ", new DialogInterface.OnClickListener() {
-                                               public void onClick(DialogInterface dialog, int id) {
-                                                   Toast.makeText(getApplicationContext(),
-                                                           "ขอบคุณครับ", Toast.LENGTH_SHORT).show();
-                                               }
-                                           });
-                                           builder.setNegativeButton("ไม่รับ", new DialogInterface.OnClickListener() {
-                                               @Override
-                                               public void onClick(DialogInterface dialog, int which) {
-                                                   //dialog.dismiss();
-                                               }
-                                           });
-                                           builder.show();
+            AlertDialog.Builder amountPickerDialog = new AlertDialog.Builder(MainActivity.this);
+            amountPickerDialog.setTitle("Select "+ rowData.getName() + " quantity");
+            amountPickerDialog.setView(numberPicker);
+            amountPickerDialog.setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    rowData.setQuantity(numberPicker.getValue());                   //Set the quantity in FoodObject from clicked row according to NumberPicker
+                    foodItemTableDataAdapter.notifyDataSetChanged();                //Update the table
+                    Toast.makeText(getApplicationContext(),rowData.getName()+ " was set quantity to " + numberPicker.getValue(), Toast.LENGTH_SHORT).show();
 
+                }
 
+            });
+            amountPickerDialog.show();
 
-                                           NumberDialog myDiag =
-                                                   NumberDialog.newInstance(3, 123);
-                                           myDiag.show(getFragmentManager(), "Diag");
-
-                                           */
-/*
-                                           Intent i;
-                                           i = new Intent(MainActivity.this, NumberPickerDialog.class);
-                                           startActivity(i);
-*/
-                                       }
-                                   }
-        );
-
+        }
     }
 
     @Override
@@ -189,12 +165,5 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    class ProductClick implements TableDataClickListener<String[]> {
-        @Override
-        public void onDataClicked(int rowIndex, String[] clickedData) {
-            String clickedCarString = clickedData[0] + clickedData[1];
-            Toast.makeText(MainActivity.this, clickedCarString, Toast.LENGTH_SHORT).show();
-        }
-    }
 
 }

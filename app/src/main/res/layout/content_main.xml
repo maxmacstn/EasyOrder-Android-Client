@@ -18,9 +18,10 @@
         table:tableView_columnCount="4" />
 
     <Button
+        android:id="@+id/b_submit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Submit to kitchen"/>
+        android:text="Submit to kitchen" />
 
     <LinearLayout
         android:layout_width="match_parent"

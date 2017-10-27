@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name="com.example.magiapp.easyorder.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -19,7 +19,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ConfigActivity" />
+        <activity android:name="com.example.magiapp.easyorder.ConfigActivity" />
+        <activity android:name="com.example.magiapp.easyorder.ConfirmOrderActivity"
+            android:label="Confirm order"></activity>
     </application>
 
 </manifest>

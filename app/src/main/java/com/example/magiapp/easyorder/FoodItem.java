@@ -1,10 +1,12 @@
 package com.example.magiapp.easyorder;
 
+import java.io.Serializable;
+
 /**
  * Created by MaxMac on 27-Oct-17.
  */
 
-public class FoodItem {
+public class FoodItem implements Serializable{
     private double price;
     private String name;
     private int quantity = 0;

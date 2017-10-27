@@ -6,12 +6,8 @@ package com.example.magiapp.easyorder;
 
 
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import de.codecrafters.tableview.TableView;
@@ -20,7 +16,6 @@ import de.codecrafters.tableview.toolkit.LongPressAwareTableDataAdapter;
 
 import java.text.NumberFormat;
 import java.util.List;
-import java.util.Locale;
 
 import static java.lang.String.format;
 
