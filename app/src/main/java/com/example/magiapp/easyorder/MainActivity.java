@@ -7,10 +7,13 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +27,7 @@ import java.util.List;
 import biz.kasual.materialnumberpicker.MaterialNumberPicker;
 import de.codecrafters.tableview.TableView;
 import de.codecrafters.tableview.listeners.TableDataClickListener;
+import de.codecrafters.tableview.listeners.TableDataLongClickListener;
 import de.codecrafters.tableview.model.TableColumnWeightModel;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 
@@ -114,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
         table.setHeaderAdapter(new SimpleTableHeaderAdapter(this, foodItemTableDataAdapter.getHeaderData()));
         table.setDataAdapter(foodItemTableDataAdapter);
         table.addDataClickListener(new ClickedTableRow());
+        table.addDataLongClickListener(new LongClickedTableRow());
 
     }
 
@@ -138,7 +143,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onDataClicked(int rowIndex, Object clickedData) {
             final FoodItem rowData = (FoodItem) clickedData;
-            //Toast.makeText(MainActivity.this, "U clicked" + rowData.getName(), Toast.LENGTH_SHORT).show();
             int currentQty = rowData.getQuantity();
 
             final MaterialNumberPicker numberPicker = new MaterialNumberPicker.Builder(MainActivity.this)
@@ -168,6 +172,82 @@ public class MainActivity extends AppCompatActivity {
             });
             amountPickerDialog.show();
 
+        }
+    }
+
+    private class LongClickedTableRow implements TableDataLongClickListener{
+        @Override
+        public boolean onDataLongClicked(int rowIndex, Object clickedData) {
+            Toast.makeText(getApplicationContext(), "Too much order!!",Toast.LENGTH_SHORT).show();
+            final FoodItem rowData = (FoodItem) clickedData;
+            int currentQty = rowData.getQuantity();
+
+
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            LayoutInflater inflater = getLayoutInflater();
+            builder.setTitle("Enter quantity for "+ rowData.getName());
+            View view = inflater.inflate(R.layout.dialog_edittext, null);
+            builder.setView(view);
+
+            final EditText quantityInput = (EditText) view.findViewById(R.id.textinput_dialog);
+
+            builder.setPositiveButton("Apply", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    final int numQuantityInput = Integer.parseInt(quantityInput.getText().toString());
+                    if (numQuantityInput <= 50) {
+                        rowData.setQuantity(numQuantityInput);                          //Set the quantity in FoodObject from clicked row according to NumberPicker
+                        foodItemTableDataAdapter.notifyDataSetChanged();                //Update the table
+                        Toast.makeText(getApplicationContext(),rowData.getName()+ " was set quantity to " + numQuantityInput, Toast.LENGTH_SHORT).show();
+
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Too much order!!",Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+
+            builder.show();
+            /*
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle("Enter custom quantity");
+            // I'm using fragment here so I'm using getView() to provide ViewGroup
+            // but you can provide here any other instance of ViewGroup from your Fragment / Activity
+            View viewInflated = LayoutInflater.from(MainActivity.this).inflate(R.layout.dialog_edittext, null);
+            // Set up the input
+            final EditText quantityInput = (EditText) viewInflated.findViewById(R.id.textinput_dialog);
+            //final int numQuantityInput = Integer.parseInt(quantityInput.getText().toString());
+
+            // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+            builder.setView(viewInflated);
+
+            // Set up the buttons
+            builder.setPositiveButton("Apply", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+
+                    dialog.dismiss();
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+
+            builder.show();
+            */
+
+            return true;
         }
     }
 
