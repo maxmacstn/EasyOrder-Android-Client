@@ -1,4 +1,4 @@
-package com.example.magiapp.easyorder;
+package com.example.magiapp.easyorder.data;
 
 /**
  * Created by MaxMac on 27-Oct-17.
@@ -10,6 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.example.magiapp.easyorder.R;
+
 import de.codecrafters.tableview.TableView;
 import de.codecrafters.tableview.toolkit.LongPressAwareTableDataAdapter;
 //import de.codecrafters.tableviewexample.data.Car;
@@ -24,6 +27,7 @@ public class FoodItemTableDataAdapter extends LongPressAwareTableDataAdapter<Foo
 
     private static final int TEXT_SIZE = 14;
     private static final NumberFormat PRICE_FORMATTER = NumberFormat.getNumberInstance();
+    private static final String[] TABLE_HEADERS = {"Type","ID", "Name", "Price","Qty."};
 
 
     public FoodItemTableDataAdapter(final Context context, final List<FoodItem> data, final TableView<FoodItem> tableView) {
@@ -123,31 +127,9 @@ public class FoodItemTableDataAdapter extends LongPressAwareTableDataAdapter<Foo
         return textView;
     }
 
-    /*
+    public String[] getHeaderData(){
+        return TABLE_HEADERS;
 
-    private static class CarNameUpdater implements TextWatcher {
-
-        private Car carToUpdate;
-
-        public CarNameUpdater(Car carToUpdate) {
-            this.carToUpdate = carToUpdate;
-        }
-
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            // no used
-        }
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            // not used
-        }
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            carToUpdate.setName(s.toString());
-        }
     }
-    */
 
 }

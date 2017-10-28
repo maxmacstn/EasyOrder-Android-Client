@@ -4,34 +4,78 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.magiapp.easyorder.ConfirmOrderActivity"
     android:orientation="vertical"
-    >
+    tools:context="com.example.magiapp.easyorder.ConfirmOrderActivity">
 
     <de.codecrafters.tableview.TableView
-        xmlns:table="http://schemas.android.com/apk/res-auto"
         android:id="@+id/foodConfirmTable"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        table:tableView_columnCount="4" />
+        app:tableView_columnCount="4" />
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Table no."/>
-    <TextView
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="20dp"
+            android:text="Table no." />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="null" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Total Item "/>
-    <TextView
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="8dp"
+            android:text="Total Items" />
+
+        <TextView
+            android:id="@+id/confirm_order_totalItem"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="null" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Total price"/>
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Total price"
+            android:paddingRight="11dp"
+            />
+
+        <TextView
+            android:id="@+id/confirm_order_totalPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="null" />
+
+    </LinearLayout>
+
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Confirm"/>
+        android:text="Confirm" />
 
 
 </LinearLayout>

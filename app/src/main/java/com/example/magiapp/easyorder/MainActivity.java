@@ -14,6 +14,10 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.magiapp.easyorder.data.FoodItem;
+import com.example.magiapp.easyorder.data.FoodItemTableDataAdapter;
+import com.example.magiapp.easyorder.data.MenuMaker;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +31,6 @@ import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 public class MainActivity extends AppCompatActivity {
 
 
-    private static final String[] TABLE_HEADERS = {"Type","ID", "Name", "Price","Qty."};
     TextView connectStatus;
     TableView table;
     FoodItemTableDataAdapter foodItemTableDataAdapter;
@@ -49,26 +52,27 @@ public class MainActivity extends AppCompatActivity {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ArrayList<FoodItem> orderList = getOrderedList(menuList);
+                if (orderList.size() == 0){
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setMessage("Must order at least 1 item");
+                    builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //dialog.dismiss();
+                        }
+                    });
+                    builder.show();
+                    return;
+                }
+
+
                 Intent intent = new Intent(MainActivity.this, ConfirmOrderActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("menuList",((ArrayList)menuList));
+                intent.putExtra("menuList",orderList);
                 startActivity(intent);
             }
         });
-
-
-/*
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-        */
-
-
     }
 
     @Override
@@ -106,11 +110,22 @@ public class MainActivity extends AppCompatActivity {
         columnModel.setColumnWeight(3, 2);
         columnModel.setColumnWeight(4, 2);
         table.setColumnModel(columnModel);
-        table.setHeaderAdapter(new SimpleTableHeaderAdapter(this, TABLE_HEADERS));
         foodItemTableDataAdapter = new FoodItemTableDataAdapter(this,menuList,table);
+        table.setHeaderAdapter(new SimpleTableHeaderAdapter(this, foodItemTableDataAdapter.getHeaderData()));
         table.setDataAdapter(foodItemTableDataAdapter);
         table.addDataClickListener(new ClickedTableRow());
 
+    }
+
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 || resultCode == RESULT_OK) {
+            String responseText = data.getStringExtra("result");
+            connectStatus.setText("Connected to server at " + responseText);
+        }
     }
 
     /**
@@ -156,13 +171,19 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1 || resultCode == RESULT_OK) {
-            String responseText = data.getStringExtra("result");
-            connectStatus.setText("Connected to server at " + responseText);
+    /**
+     * Get the order from menu list that quantity isn't zero
+     * @param menuList List of FoodItem (menuList)
+     * @return ArrayList of FoodItem that quantity isn't zero
+     */
+    private ArrayList<FoodItem> getOrderedList(List<FoodItem> menuList) {
+        ArrayList<FoodItem> orderList = new ArrayList<>();
+
+        for (FoodItem item : menuList) {
+            if (item.getQuantity() != 0)
+                orderList.add(item);
         }
+        return orderList;
     }
 
 

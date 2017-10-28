@@ -3,10 +3,16 @@ package com.example.magiapp.easyorder;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.widget.TextView;
+
+import com.example.magiapp.easyorder.data.FoodItem;
+import com.example.magiapp.easyorder.data.FoodItemTableDataAdapter;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import de.codecrafters.tableview.TableView;
 import de.codecrafters.tableview.model.TableColumnWeightModel;
@@ -16,6 +22,9 @@ public class ConfirmOrderActivity extends AppCompatActivity {
     TableView table;
     private static final String[] TABLE_HEADERS = {"Type", "ID", "Name", "Price", "Qty."};
     FoodItemTableDataAdapter foodItemTableDataAdapter;
+    List<FoodItem> orderList;
+    TextView totalItem;
+    TextView totalPrice;
 
 
     @Override
@@ -23,11 +32,12 @@ public class ConfirmOrderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_confirm_order);
         Intent i = getIntent();
-        List menuList = (ArrayList<FoodItem>) i.getSerializableExtra("menuList");
-        List orderList = getOrderedList(menuList);
+        orderList = (ArrayList<FoodItem>) i.getSerializableExtra("menuList");
         table = (TableView<String>) findViewById(R.id.foodConfirmTable);
+        totalItem = (TextView) findViewById(R.id.confirm_order_totalItem);
+        totalPrice = (TextView) findViewById(R.id.confirm_order_totalPrice);
         initTable(orderList);
-
+        initNumberData();
     }
 
     private void initTable(List orderList) {
@@ -43,13 +53,15 @@ public class ConfirmOrderActivity extends AppCompatActivity {
         table.setDataAdapter(foodItemTableDataAdapter);
     }
 
-    private List getOrderedList(List<FoodItem> menu) {
-        ArrayList<FoodItem> orderList = new ArrayList<>();
-
-        for (FoodItem item : menu) {
-            if (item.getQuantity() != 0)
-                orderList.add(item);
+    private void initNumberData(){
+        double price = 0;
+        int items = 0;
+        for (FoodItem item: orderList) {
+            price += item.getQuantity() * item.getPrice();
+            items += item.getQuantity();
         }
-        return orderList;
+        totalItem.setText(items + "");
+        totalPrice.setText(String.format("%.2f฿",price));
     }
+
 }

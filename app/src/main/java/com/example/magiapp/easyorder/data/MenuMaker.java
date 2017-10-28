@@ -1,4 +1,4 @@
-package com.example.magiapp.easyorder;
+package com.example.magiapp.easyorder.data;
 
 import java.util.ArrayList;
 import java.util.List;

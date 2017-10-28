@@ -1,4 +1,6 @@
-package com.example.magiapp.easyorder;
+package com.example.magiapp.easyorder.data;
+
+import com.example.magiapp.easyorder.R;
 
 import java.io.Serializable;
 
