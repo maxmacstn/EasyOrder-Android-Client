@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.example.magiapp.easyorder.R;
 
+import de.codecrafters.tableview.TableDataAdapter;
 import de.codecrafters.tableview.TableView;
 import de.codecrafters.tableview.toolkit.LongPressAwareTableDataAdapter;
 //import de.codecrafters.tableviewexample.data.Car;
@@ -23,7 +24,7 @@ import java.util.List;
 import static java.lang.String.format;
 
 
-public class FoodItemTableDataAdapter extends LongPressAwareTableDataAdapter<FoodItem> {
+public class FoodItemTableDataAdapter extends TableDataAdapter<FoodItem> {
 
     private static final int TEXT_SIZE = 14;
     private static final NumberFormat PRICE_FORMATTER = NumberFormat.getNumberInstance();
@@ -31,11 +32,11 @@ public class FoodItemTableDataAdapter extends LongPressAwareTableDataAdapter<Foo
 
 
     public FoodItemTableDataAdapter(final Context context, final List<FoodItem> data, final TableView<FoodItem> tableView) {
-        super(context, data, tableView);
+        super(context, data);
     }
 
     @Override
-    public View getDefaultCellView(int rowIndex, int columnIndex, ViewGroup parentView) {
+    public View getCellView(int rowIndex, int columnIndex, ViewGroup parentView) {
         final FoodItem foodItem = getRowData(rowIndex);
         View renderedView = null;
 
@@ -60,42 +61,6 @@ public class FoodItemTableDataAdapter extends LongPressAwareTableDataAdapter<Foo
         return renderedView;
     }
 
-
-
-    @Override
-    public View getLongPressCellView(int rowIndex, int columnIndex, ViewGroup parentView) {
-        /*
-        final Car car = getRowData(rowIndex);
-        View renderedView = null;
-
-        switch (columnIndex) {
-            case 1:
-                renderedView = renderEditableCatName(car);
-                break;
-            default:
-                renderedView = getDefaultCellView(rowIndex, columnIndex, parentView);
-        }
-
-        return renderedView;
-        */
-        return null;
-
-    }
-
-
-    /*
-
-    private View renderEditableCatName(final Car car) {
-        final EditText editText = new EditText(getContext());
-        editText.setText(car.getName());
-        editText.setPadding(20, 10, 20, 10);
-        editText.setTextSize(TEXT_SIZE);
-        editText.setSingleLine();
-        editText.addTextChangedListener(new CarNameUpdater(car));
-        return editText;
-    }
-
-    */
 
     private View renderPrice(final FoodItem foodItem) {
         final String priceString = String.format("%.2f฿",foodItem.getPrice());
@@ -131,5 +96,6 @@ public class FoodItemTableDataAdapter extends LongPressAwareTableDataAdapter<Foo
         return TABLE_HEADERS;
 
     }
+
 
 }
