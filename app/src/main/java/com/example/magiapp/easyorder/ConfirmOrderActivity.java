@@ -1,18 +1,24 @@
 package com.example.magiapp.easyorder;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.magiapp.easyorder.data.FoodItem;
 import com.example.magiapp.easyorder.data.FoodItemTableDataAdapter;
+import com.example.magiapp.easyorder.data.SendData;
 
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.Timer;
 
 import de.codecrafters.tableview.TableView;
 import de.codecrafters.tableview.model.TableColumnWeightModel;
@@ -25,6 +31,7 @@ public class ConfirmOrderActivity extends AppCompatActivity {
     List<FoodItem> orderList;
     TextView totalItem;
     TextView totalPrice;
+    Button confirmOrder;
 
 
     @Override
@@ -36,6 +43,8 @@ public class ConfirmOrderActivity extends AppCompatActivity {
         table = (TableView<String>) findViewById(R.id.foodConfirmTable);
         totalItem = (TextView) findViewById(R.id.confirm_order_totalItem);
         totalPrice = (TextView) findViewById(R.id.confirm_order_totalPrice);
+        confirmOrder = (Button) findViewById(R.id.b_confirm_order);
+        confirmOrder.setOnClickListener(new OnConfirmOrderClicked());
         initTable(orderList);
         initNumberData();
     }
@@ -62,6 +71,59 @@ public class ConfirmOrderActivity extends AppCompatActivity {
         }
         totalItem.setText(items + "");
         totalPrice.setText(String.format("%.2f฿",price));
+    }
+
+    private class OnConfirmOrderClicked implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+            ProgressDialog dialog = new ProgressDialog(ConfirmOrderActivity.this);
+            dialog.show(ConfirmOrderActivity.this,"Sending","Loading",false);
+            SendData sendData = new SendData("192.168.1.15",orderList,0);
+          //  sendData.start();
+/*
+            final ProgressDialog progress=ProgressDialog.show(ConfirmOrderActivity.this,"Sending","Loading",false);
+            new Thread()
+            {
+                public void run()
+                {
+                    try{
+                        ConfirmOrderActivity.this.runOnUiThread(new Runnable(){
+                            @Override
+                            public void run() {
+                                
+                                // your code
+                                try {
+                                    Thread.sleep(2000);
+                                }catch (InterruptedException e){
+
+                                }
+                            }
+                        });
+                    }
+                    catch(Exception e)
+                    {
+                    }
+                    progress.dismiss();
+                }
+            }.start();
+            */
+            /*
+
+            while (!sendData.isSucess()){
+                //Log.d("test", "loop");
+            }*/
+            try {
+                Thread.sleep(5000);
+
+            }catch (InterruptedException e){
+
+            }
+
+            Log.d("test", "loop");
+            dialog.hide();
+
+            //dialog.hide();
+        }
     }
 
 }

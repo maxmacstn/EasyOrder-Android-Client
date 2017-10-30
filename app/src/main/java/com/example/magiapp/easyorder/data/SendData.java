@@ -1,12 +1,18 @@
 package com.example.magiapp.easyorder.data;
 
+import android.app.ProgressDialog;
+import android.util.Log;
+
+import com.example.magiapp.easyorder.ConfirmOrderActivity;
+import com.example.magiapp.easyorder.R;
+
 import java.util.List;
 
 /**
  * Created by MaxMac on 30-Oct-17.
  */
 
-public class SendData implements Runnable {
+public class SendData extends Thread {
     String ip;
     List<FoodItem> foodItemsList;
     boolean sendStatus = false;
@@ -24,13 +30,15 @@ public class SendData implements Runnable {
         Send a data to server (Por's job)
          */
         try {
-            Thread.sleep(5000);
+            Thread.sleep(2000);
+            sendStatus = true;
+            Log.d("Thread", "true");
 
         }catch (InterruptedException e){
 
         }
 
-
+        return;
     }
 
     public boolean isSucess(){
