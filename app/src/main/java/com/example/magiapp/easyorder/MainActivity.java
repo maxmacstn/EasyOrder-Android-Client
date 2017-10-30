@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     FoodItemTableDataAdapter foodItemTableDataAdapter;
     Button submit;
     List menuList;
+    boolean isDialogShow = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,6 +143,11 @@ public class MainActivity extends AppCompatActivity {
     private class ClickedTableRow implements TableDataClickListener{
         @Override
         public void onDataClicked(int rowIndex, Object clickedData) {
+            if(isDialogShow)
+                return;
+
+            isDialogShow = true;
+
             final FoodItem rowData = (FoodItem) clickedData;
             int currentQty = rowData.getQuantity();
 
@@ -160,13 +166,14 @@ public class MainActivity extends AppCompatActivity {
             AlertDialog.Builder amountPickerDialog = new AlertDialog.Builder(MainActivity.this);
             amountPickerDialog.setTitle("Select "+ rowData.getName() + " quantity");
             amountPickerDialog.setView(numberPicker);
+            amountPickerDialog.setCancelable(false);
             amountPickerDialog.setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     rowData.setQuantity(numberPicker.getValue());                   //Set the quantity in FoodObject from clicked row according to NumberPicker
                     foodItemTableDataAdapter.notifyDataSetChanged();                //Update the table
                     Toast.makeText(getApplicationContext(),rowData.getName()+ " was set quantity to " + numberPicker.getValue(), Toast.LENGTH_SHORT).show();
-
+                    isDialogShow = false;
                 }
 
             });
