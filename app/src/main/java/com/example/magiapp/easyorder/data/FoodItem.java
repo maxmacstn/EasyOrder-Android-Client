@@ -66,4 +66,9 @@ public class FoodItem implements Serializable{
     }
 
     public String getID(){return id;}
+
+    @Override
+    public String toString() {
+        return String.format("\n%-5s %-15s %.2f฿   qty= %d",id,name,price,quantity);
+    }
 }
