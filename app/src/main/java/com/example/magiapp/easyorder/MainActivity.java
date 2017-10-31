@@ -171,7 +171,6 @@ public class MainActivity extends AppCompatActivity {
     private class LongClickedTableRow implements TableDataLongClickListener{
         @Override
         public boolean onDataLongClicked(int rowIndex, Object clickedData) {
-            Toast.makeText(getApplicationContext(), "Too much order!!",Toast.LENGTH_SHORT).show();
             final FoodItem rowData = (FoodItem) clickedData;
             int currentQty = rowData.getQuantity();
 

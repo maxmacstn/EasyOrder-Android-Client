@@ -7,6 +7,7 @@
         android:id="@+id/textinput_dialog"
         android:inputType="number"
         android:layout_width="match_parent"
+        android:maxLength="2"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginLeft="4dp"
