@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     TableView table;
     FoodItemTableDataAdapter foodItemTableDataAdapter;
     Button submit;
-    List menuList;
+    List<FoodItem> menuList;
     boolean isDialogShow = false;
 
     @Override
@@ -54,30 +54,8 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         initTable();
 
-        submit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ArrayList<FoodItem> orderList = getOrderedList(menuList);
-                if (orderList.size() == 0){
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    builder.setMessage("Must order at least 1 item");
-                    builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            //dialog.dismiss();
-                        }
-                    });
-                    builder.show();
-                    return;
-                }
-
-
-                Intent intent = new Intent(MainActivity.this, ConfirmOrderActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("menuList",orderList);
-                startActivity(intent);
-            }
-        });
+        submit.setOnClickListener(new OnClickedSubmitButton());
+        autoInitRandomOrder();
     }
 
     @Override
@@ -107,6 +85,9 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Initialize the Sortable table view with data from list
+     */
     private void initTable() {
         TableColumnWeightModel columnModel = new TableColumnWeightModel(5);
         columnModel.setColumnWeight(0, 2);
@@ -134,12 +115,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     /**
      * Display number picker after clicked a table row
      * and update FoodItem object quantity according to the data that previously picked from the DataPicker
      *
      */
-
     private class ClickedTableRow implements TableDataClickListener{
         @Override
         public void onDataClicked(int rowIndex, Object clickedData) {
@@ -182,6 +163,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Display number text field after long clicked a table row
+     * and update FoodItem object quantity according to the data that previously entered value from the textField
+     *
+     */
     private class LongClickedTableRow implements TableDataLongClickListener{
         @Override
         public boolean onDataLongClicked(int rowIndex, Object clickedData) {
@@ -221,42 +207,41 @@ public class MainActivity extends AppCompatActivity {
             });
 
             builder.show();
-            /*
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setTitle("Enter custom quantity");
-            // I'm using fragment here so I'm using getView() to provide ViewGroup
-            // but you can provide here any other instance of ViewGroup from your Fragment / Activity
-            View viewInflated = LayoutInflater.from(MainActivity.this).inflate(R.layout.dialog_edittext, null);
-            // Set up the input
-            final EditText quantityInput = (EditText) viewInflated.findViewById(R.id.textinput_dialog);
-            //final int numQuantityInput = Integer.parseInt(quantityInput.getText().toString());
-
-            // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-            builder.setView(viewInflated);
-
-            // Set up the buttons
-            builder.setPositiveButton("Apply", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-
-
-                    dialog.dismiss();
-                }
-            });
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            });
-
-            builder.show();
-            */
 
             return true;
         }
     }
+
+
+    /**
+     * Action Listener when clicked submit button.
+     * - Get order from menuList and send to ConfirmOrderActivity
+     */
+    private class OnClickedSubmitButton implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+            ArrayList<FoodItem> orderList = getOrderedList(menuList);
+            if (orderList.size() == 0){
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setMessage("Must order at least 1 item");
+                builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //dialog.dismiss();
+                    }
+                });
+                builder.show();
+                return;
+            }
+
+
+            Intent intent = new Intent(MainActivity.this, ConfirmOrderActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.putExtra("menuList",orderList);
+            startActivity(intent);
+        }
+    }
+
 
     /**
      * Get the order from menu list that quantity isn't zero
@@ -271,6 +256,22 @@ public class MainActivity extends AppCompatActivity {
                 orderList.add(item);
         }
         return orderList;
+    }
+
+
+    /**
+     *This method will auto random the order for easier debugging process
+     * Auto order 5-10 items from all items in list
+     * Auto set quantity from 1-5
+     */
+    private void autoInitRandomOrder(){
+
+
+        for (int i = 0; i < (int)(Math.random() * 10 + 5); i++){
+            menuList.get((int)(Math.random() * menuList.size())).setQuantity((int)(Math.random() * 5 + 1));                   //Set the quantity in FoodObject from clicked row according to NumberPicker
+        }
+        foodItemTableDataAdapter.notifyDataSetChanged();
+
     }
 
 

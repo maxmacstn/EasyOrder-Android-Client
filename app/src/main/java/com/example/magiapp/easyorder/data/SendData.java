@@ -12,7 +12,7 @@ import java.util.List;
  * Created by MaxMac on 30-Oct-17.
  */
 
-public class SendData extends Thread {
+public class SendData{
     String ip;
     List<FoodItem> foodItemsList;
     boolean sendStatus = false;
@@ -24,24 +24,30 @@ public class SendData extends Thread {
         this.tableNum = tableNum;
     }
 
-    @Override
-    public void run() {
+    public boolean send() {
         /*
         Send a data to server (Por's job)
+
+        Implement your code here
+
+        Maximum time = 6000ms otherwise this function would be killed.
          */
         try {
+            Log.d("Send data", "Send to "+ip +"\t Table no." + tableNum);
+            Log.d("Send data", foodItemsList.toString());
             Thread.sleep(2000);
             sendStatus = true;
             Log.d("Thread", "true");
+            return true;
 
         }catch (InterruptedException e){
 
         }
 
-        return;
+        return false;
     }
 
-    public boolean isSucess(){
+    public boolean isSuccess(){
         return sendStatus;
     }
 }
