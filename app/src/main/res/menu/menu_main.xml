@@ -2,6 +2,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.magiapp.easyorder.MainActivity">
+
+    <item
+        android:icon="@drawable/table_num"
+        android:title="tableIcon"
+        app:showAsAction="always"
+    />
+
+    <item
+        android:id="@+id/action_selectTableNum"
+        android:title="InputTableNum"
+        app:actionViewClass="android.widget.EditText"
+        app:showAsAction="always"/>
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"

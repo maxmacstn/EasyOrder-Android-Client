@@ -10,12 +10,12 @@
     android:orientation="vertical">
 
     <de.codecrafters.tableview.TableView
-        xmlns:table="http://schemas.android.com/apk/res-auto"
+        android:focusable="false"
         android:id="@+id/foodTable"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        table:tableView_columnCount="4" />
+        app:tableView_columnCount="4" />
 
     <Button
         android:id="@+id/b_submit"

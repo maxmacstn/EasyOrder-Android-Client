@@ -1,17 +1,27 @@
 package com.example.magiapp.easyorder;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputFilter;
+import android.text.InputType;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -41,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     Button submit;
     List<FoodItem> menuList;
     boolean isDialogShow = false;
+    private EditText actionBarET_tableNum;
+    private int tableNum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,12 +68,42 @@ public class MainActivity extends AppCompatActivity {
 
         submit.setOnClickListener(new OnClickedSubmitButton());
         autoInitRandomOrder();
+
+
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        MenuItem tableNumMenu = menu.findItem(R.id.action_selectTableNum);
+        final EditText et_tableNum = (EditText)MenuItemCompat.getActionView(tableNumMenu);
+        et_tableNum.setHint("-");
+        et_tableNum.setInputType(InputType.TYPE_CLASS_NUMBER);
+        et_tableNum.setMaxWidth(100);
+        et_tableNum.setGravity(Gravity.CENTER);
+        et_tableNum.setImeOptions(EditorInfo.IME_ACTION_SEND);
+        et_tableNum.setHeight(200);
+        et_tableNum.setFilters(new InputFilter[] { new InputFilter.LengthFilter(2) });
+
+        this.actionBarET_tableNum = et_tableNum;
+        actionBarET_tableNum.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if(actionId==EditorInfo.IME_ACTION_SEND){
+                    Log.d("et","clear ");
+                    actionBarET_tableNum.clearFocus();
+                    InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    in.hideSoftInputFromWindow(actionBarET_tableNum.getApplicationWindowToken(),InputMethodManager.HIDE_NOT_ALWAYS);
+
+                    tableNum = Integer.parseInt(actionBarET_tableNum.getText().toString());
+                }
+                return false;
+            }
+        });
+
         return true;
     }
 
@@ -220,9 +262,22 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             ArrayList<FoodItem> orderList = getOrderedList(menuList);
-            if (orderList.size() == 0){
+            if (orderList.size() == 0 ){
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setMessage("Must order at least 1 item");
+                builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //dialog.dismiss();
+                    }
+                });
+                builder.show();
+                return;
+            }
+
+            if(tableNum == 0){
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setMessage("Please input table number in the top right field.");
                 builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -237,6 +292,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, ConfirmOrderActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.putExtra("menuList",orderList);
+            intent.putExtra("tableNum",tableNum);
             startActivity(intent);
         }
     }
