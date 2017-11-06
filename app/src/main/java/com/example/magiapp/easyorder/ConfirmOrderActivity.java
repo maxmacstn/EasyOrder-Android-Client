@@ -36,7 +36,10 @@ public class ConfirmOrderActivity extends AppCompatActivity {
     List<FoodItem> orderList;
     TextView totalItem;
     TextView totalPrice;
+    TextView tv_tableNumber;
     Button confirmOrder;
+    int tableNum;
+    String ipVal;
 
 
     @Override
@@ -45,10 +48,13 @@ public class ConfirmOrderActivity extends AppCompatActivity {
         setContentView(R.layout.activity_confirm_order);
         Intent i = getIntent();
         orderList = (ArrayList<FoodItem>) i.getSerializableExtra("menuList");
+        tableNum = (int) i.getSerializableExtra("tableNum");
         table = (TableView<String>) findViewById(R.id.foodConfirmTable);
+        ipVal = (String) i.getSerializableExtra("ipVal");
         totalItem = (TextView) findViewById(R.id.confirm_order_totalItem);
         totalPrice = (TextView) findViewById(R.id.confirm_order_totalPrice);
         confirmOrder = (Button) findViewById(R.id.b_confirm_order);
+        tv_tableNumber = (TextView) findViewById(R.id.tv_tableNum);
         confirmOrder.setOnClickListener(new OnConfirmOrderClicked());
         initTable(orderList);
         initNumberData();
@@ -84,6 +90,7 @@ public class ConfirmOrderActivity extends AppCompatActivity {
         }
         totalItem.setText(items + "");
         totalPrice.setText(String.format("%.2f฿", price));
+        tv_tableNumber.setText(tableNum+"");
     }
 
     /**
@@ -93,8 +100,24 @@ public class ConfirmOrderActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
 
+            //Check if IP Address is added.
+            if (ipVal == null){
+                AlertDialog.Builder builder = new AlertDialog.Builder(ConfirmOrderActivity.this);
+                builder.setMessage("IP Address of server is missing \nplease enter it in setting.");
+                builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //dialog.dismiss();
+                    }
+                });
+                builder.show();
+                return;
+            }
+
+
+            //Start networking thread.
             final MyAsyncTask task = new MyAsyncTask();
-            task.execute("127.0.0.1");
+            task.execute("127.0.0.1");                               //I still donno what is the arg in this line
 
             Handler handler = new Handler();
             handler.postDelayed(new Runnable()
@@ -123,7 +146,8 @@ public class ConfirmOrderActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(String... params) {
-            SendData sendData = new SendData("192.168.1.15", orderList, 0);
+            SendData sendData = new SendData(ipVal, orderList, tableNum);
+
             sendData.send();
             return sendData.isSuccess();
 
