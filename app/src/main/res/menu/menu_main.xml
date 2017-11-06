@@ -4,6 +4,7 @@
     tools:context="com.example.magiapp.easyorder.MainActivity">
 
     <item
+        android:id="@+id/action_ButtonSelectTableNum"
         android:icon="@drawable/table_num"
         android:title="tableIcon"
         app:showAsAction="always"

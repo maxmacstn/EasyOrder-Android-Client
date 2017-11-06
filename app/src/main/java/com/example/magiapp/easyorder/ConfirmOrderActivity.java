@@ -39,6 +39,7 @@ public class ConfirmOrderActivity extends AppCompatActivity {
     TextView tv_tableNumber;
     Button confirmOrder;
     int tableNum;
+    String ipVal;
 
 
     @Override
@@ -49,6 +50,7 @@ public class ConfirmOrderActivity extends AppCompatActivity {
         orderList = (ArrayList<FoodItem>) i.getSerializableExtra("menuList");
         tableNum = (int) i.getSerializableExtra("tableNum");
         table = (TableView<String>) findViewById(R.id.foodConfirmTable);
+        ipVal = (String) i.getSerializableExtra("ipVal");
         totalItem = (TextView) findViewById(R.id.confirm_order_totalItem);
         totalPrice = (TextView) findViewById(R.id.confirm_order_totalPrice);
         confirmOrder = (Button) findViewById(R.id.b_confirm_order);
@@ -98,8 +100,24 @@ public class ConfirmOrderActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
 
+            //Check if IP Address is added.
+            if (ipVal == null){
+                AlertDialog.Builder builder = new AlertDialog.Builder(ConfirmOrderActivity.this);
+                builder.setMessage("IP Address of server is missing \nplease enter it in setting.");
+                builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //dialog.dismiss();
+                    }
+                });
+                builder.show();
+                return;
+            }
+
+
+            //Start networking thread.
             final MyAsyncTask task = new MyAsyncTask();
-            task.execute("127.0.0.1");
+            task.execute("127.0.0.1");                               //I still donno what is the arg in this line
 
             Handler handler = new Handler();
             handler.postDelayed(new Runnable()
@@ -128,7 +146,8 @@ public class ConfirmOrderActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(String... params) {
-            SendData sendData = new SendData("192.168.1.15", orderList, tableNum);
+            SendData sendData = new SendData(ipVal, orderList, tableNum);
+
             sendData.send();
             return sendData.isSuccess();
 

@@ -52,13 +52,16 @@ public class MainActivity extends AppCompatActivity {
     List<FoodItem> menuList;
     boolean isDialogShow = false;
     private EditText actionBarET_tableNum;
-    private int tableNum;
+   // private int tableNum;
+    private String ipVal;
+    private MenuItem b_selectTableNum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        b_selectTableNum = (MenuItem) findViewById(R.id.action_ButtonSelectTableNum);
         table = (TableView<String>) findViewById(R.id.foodTable);
         submit = (Button) findViewById(R.id.b_submit);
         connectStatus = (TextView) findViewById(R.id.tv_connectStatus_main);
@@ -69,8 +72,6 @@ public class MainActivity extends AppCompatActivity {
         submit.setOnClickListener(new OnClickedSubmitButton());
         autoInitRandomOrder();
 
-
-
     }
 
     @Override
@@ -79,26 +80,26 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         MenuItem tableNumMenu = menu.findItem(R.id.action_selectTableNum);
-        final EditText et_tableNum = (EditText)MenuItemCompat.getActionView(tableNumMenu);
+        final EditText et_tableNum = (EditText) MenuItemCompat.getActionView(tableNumMenu);
         et_tableNum.setHint("-");
         et_tableNum.setInputType(InputType.TYPE_CLASS_NUMBER);
         et_tableNum.setMaxWidth(100);
         et_tableNum.setGravity(Gravity.CENTER);
         et_tableNum.setImeOptions(EditorInfo.IME_ACTION_SEND);
         et_tableNum.setHeight(200);
-        et_tableNum.setFilters(new InputFilter[] { new InputFilter.LengthFilter(2) });
+        et_tableNum.setFilters(new InputFilter[]{new InputFilter.LengthFilter(2)});
 
         this.actionBarET_tableNum = et_tableNum;
         actionBarET_tableNum.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if(actionId==EditorInfo.IME_ACTION_SEND){
-                    Log.d("et","clear ");
+                if (actionId == EditorInfo.IME_ACTION_SEND) {
+                    Log.d("et", "clear ");
                     actionBarET_tableNum.clearFocus();
                     InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    in.hideSoftInputFromWindow(actionBarET_tableNum.getApplicationWindowToken(),InputMethodManager.HIDE_NOT_ALWAYS);
+                    in.hideSoftInputFromWindow(actionBarET_tableNum.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
 
-                    tableNum = Integer.parseInt(actionBarET_tableNum.getText().toString());
+                    //tableNum = Integer.parseInt(actionBarET_tableNum.getText().toString());
                 }
                 return false;
             }
@@ -116,13 +117,21 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Toast.makeText(MainActivity.this, "U just press settings button", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(MainActivity.this, "U just press settings button", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(MainActivity.this, ConfigActivity.class);
             //intent.putExtra("result", ans);
             startActivityForResult(intent, 1);
 
             return true;
         }
+
+        if (id == R.id.action_ButtonSelectTableNum) {
+            actionBarET_tableNum.requestFocus();
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(actionBarET_tableNum, InputMethodManager.SHOW_IMPLICIT);
+            return true;
+        }
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -138,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         columnModel.setColumnWeight(3, 2);
         columnModel.setColumnWeight(4, 2);
         table.setColumnModel(columnModel);
-        foodItemTableDataAdapter = new FoodItemTableDataAdapter(this,menuList,table);
+        foodItemTableDataAdapter = new FoodItemTableDataAdapter(this, menuList, table);
         table.setHeaderAdapter(new SimpleTableHeaderAdapter(this, foodItemTableDataAdapter.getHeaderData()));
         table.setDataAdapter(foodItemTableDataAdapter);
         table.addDataClickListener(new ClickedTableRow());
@@ -147,12 +156,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (data == null)
+            return;
         if (requestCode == 1 || resultCode == RESULT_OK) {
             String responseText = data.getStringExtra("result");
+            ipVal = responseText;
             connectStatus.setText("Connected to server at " + responseText);
         }
     }
@@ -161,12 +172,11 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Display number picker after clicked a table row
      * and update FoodItem object quantity according to the data that previously picked from the DataPicker
-     *
      */
-    private class ClickedTableRow implements TableDataClickListener{
+    private class ClickedTableRow implements TableDataClickListener {
         @Override
         public void onDataClicked(int rowIndex, Object clickedData) {
-            if(isDialogShow)
+            if (isDialogShow)
                 return;
 
             isDialogShow = true;
@@ -187,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
                     .build();
 
             AlertDialog.Builder amountPickerDialog = new AlertDialog.Builder(MainActivity.this);
-            amountPickerDialog.setTitle("Select "+ rowData.getName() + " quantity");
+            amountPickerDialog.setTitle("Select " + rowData.getName() + " quantity");
             amountPickerDialog.setView(numberPicker);
             amountPickerDialog.setCancelable(false);
             amountPickerDialog.setPositiveButton(getString(android.R.string.ok), new DialogInterface.OnClickListener() {
@@ -195,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onClick(DialogInterface dialog, int which) {
                     rowData.setQuantity(numberPicker.getValue());                   //Set the quantity in FoodObject from clicked row according to NumberPicker
                     foodItemTableDataAdapter.notifyDataSetChanged();                //Update the table
-                    Toast.makeText(getApplicationContext(),rowData.getName()+ " was set quantity to " + numberPicker.getValue(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), rowData.getName() + " was set quantity to " + numberPicker.getValue(), Toast.LENGTH_SHORT).show();
                     isDialogShow = false;
                 }
 
@@ -208,19 +218,17 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Display number text field after long clicked a table row
      * and update FoodItem object quantity according to the data that previously entered value from the textField
-     *
      */
-    private class LongClickedTableRow implements TableDataLongClickListener{
+    private class LongClickedTableRow implements TableDataLongClickListener {
         @Override
         public boolean onDataLongClicked(int rowIndex, Object clickedData) {
             final FoodItem rowData = (FoodItem) clickedData;
             int currentQty = rowData.getQuantity();
 
 
-
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             LayoutInflater inflater = getLayoutInflater();
-            builder.setTitle("Enter quantity for "+ rowData.getName());
+            builder.setTitle("Enter quantity for " + rowData.getName());
             View view = inflater.inflate(R.layout.dialog_edittext, null);
             builder.setView(view);
 
@@ -233,10 +241,10 @@ public class MainActivity extends AppCompatActivity {
                     if (numQuantityInput <= 50) {
                         rowData.setQuantity(numQuantityInput);                          //Set the quantity in FoodObject from clicked row according to NumberPicker
                         foodItemTableDataAdapter.notifyDataSetChanged();                //Update the table
-                        Toast.makeText(getApplicationContext(),rowData.getName()+ " was set quantity to " + numQuantityInput, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), rowData.getName() + " was set quantity to " + numQuantityInput, Toast.LENGTH_SHORT).show();
 
                     } else {
-                        Toast.makeText(getApplicationContext(), "Too much order!!",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Too much order!!", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -258,11 +266,11 @@ public class MainActivity extends AppCompatActivity {
      * Action Listener when clicked submit button.
      * - Get order from menuList and send to ConfirmOrderActivity
      */
-    private class OnClickedSubmitButton implements View.OnClickListener{
+    private class OnClickedSubmitButton implements View.OnClickListener {
         @Override
         public void onClick(View v) {
             ArrayList<FoodItem> orderList = getOrderedList(menuList);
-            if (orderList.size() == 0 ){
+            if (orderList.size() == 0) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setMessage("Must order at least 1 item");
                 builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
@@ -275,7 +283,12 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            if(tableNum == 0){
+            int tableNum = 0;
+            if (actionBarET_tableNum.length() != 0){
+                tableNum = Integer.parseInt(actionBarET_tableNum.getText().toString());
+            }
+
+            if (tableNum == 0 ) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setMessage("Please input table number in the top right field.");
                 builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
@@ -291,8 +304,9 @@ public class MainActivity extends AppCompatActivity {
 
             Intent intent = new Intent(MainActivity.this, ConfirmOrderActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            intent.putExtra("menuList",orderList);
-            intent.putExtra("tableNum",tableNum);
+            intent.putExtra("menuList", orderList);
+            intent.putExtra("tableNum", tableNum);
+            intent.putExtra("ipVal", ipVal);
             startActivity(intent);
         }
     }
@@ -300,6 +314,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * Get the order from menu list that quantity isn't zero
+     *
      * @param menuList List of FoodItem (menuList)
      * @return ArrayList of FoodItem that quantity isn't zero
      */
@@ -315,15 +330,15 @@ public class MainActivity extends AppCompatActivity {
 
 
     /**
-     *This method will auto random the order for easier debugging process
+     * This method will auto random the order for easier debugging process
      * Auto order 5-10 items from all items in list
      * Auto set quantity from 1-5
      */
-    private void autoInitRandomOrder(){
+    private void autoInitRandomOrder() {
 
 
-        for (int i = 0; i < (int)(Math.random() * 10 + 5); i++){
-            menuList.get((int)(Math.random() * menuList.size())).setQuantity((int)(Math.random() * 5 + 1));                   //Set the quantity in FoodObject from clicked row according to NumberPicker
+        for (int i = 0; i < (int) (Math.random() * 10 + 5); i++) {
+            menuList.get((int) (Math.random() * menuList.size())).setQuantity((int) (Math.random() * 5 + 1));                   //Set the quantity in FoodObject from clicked row according to NumberPicker
         }
         foodItemTableDataAdapter.notifyDataSetChanged();
 
