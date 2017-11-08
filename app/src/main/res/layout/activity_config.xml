@@ -4,65 +4,70 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.magiapp.easyorder.ConfigActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context="com.example.magiapp.easyorder.ConfigActivity">
 
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-        <LinearLayout
-            android:layout_width="368dp"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            tools:layout_editor_absoluteY="0dp"
-            tools:layout_editor_absoluteX="8dp">
-            <EditText
-                android:id="@+id/et_ipField"
-                android:inputType="number|numberDecimal"
-                android:digits="0123456789."
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="Enter Host IP"/>
+            android:text="Server IP :"
+            android:textSize="20dp" />
 
-            <Button
-                android:id="@+id/b_connect"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Connect"/>
+        <EditText
+            android:id="@+id/et_ipField"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:digits="0123456789."
+            android:hint="xxx.xxx.xxx.xxx"
+            android:inputType="number|numberDecimal" />
 
-        </LinearLayout>
+
+    </LinearLayout>
     <CheckBox
         android:id="@+id/cb_rememberIP"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Remember"/>
+        android:text="Remember" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+    <Button
+        android:id="@+id/b_connect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Connect" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="Status: "/>
 
-            <TextView
-                android:id="@+id/tv_connectStatus"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="start"
-                android:text="Disconnect" />
-        </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
 
-<TextView
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:text="EasyOrder version 0.1a | NTW (Nothing works)"
-    android:gravity="center|bottom"
-    android:layout_gravity="bottom"
-    />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Status: " />
 
+        <TextView
+            android:id="@+id/tv_connectStatus"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="start"
+            android:text="Disconnect" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="bottom"
+        android:gravity="center|bottom"
+        android:text="EasyOrder version 1.0a | At lease network works!" />
 
 
 </LinearLayout>

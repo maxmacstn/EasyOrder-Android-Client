@@ -3,6 +3,7 @@ package com.example.magiapp.easyorder.data;
 import com.example.magiapp.easyorder.R;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 
 /**
  * Created by MaxMac on 27-Oct-17.
@@ -51,6 +52,23 @@ public class FoodItem implements Serializable{
         return type;
     }
 
+    public String getStringType() {
+        switch (type) {
+            case 1:
+                return "MAIN_DISH";
+            case 2:
+                return "SOUP";
+            case 3:
+                return "BEVERAGE";
+            case 4:
+                return "DESSERT";
+            default:
+                return null;
+        }
+    }
+
+
+
     public int getLogo() {
         switch (type){
             case 1:
@@ -66,6 +84,7 @@ public class FoodItem implements Serializable{
     }
 
     public String getID(){return id;}
+
 
     @Override
     public String toString() {

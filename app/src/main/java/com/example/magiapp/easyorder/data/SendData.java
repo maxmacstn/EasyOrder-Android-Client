@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -19,17 +20,33 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.util.List;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by MaxMac on 30-Oct-17.
  */
 
-public class SendData{
-    String ip;
-    List<FoodItem> foodItemsList;
-    boolean sendStatus = false;
-    int tableNum;
+public class SendData {
+    private String ip;
+    private List<FoodItem> foodItemsList;
+    private boolean sendStatus = false;
+    private int tableNum;
+    private int uniqueIDfromServer;
 
-    public SendData(String ip, List<FoodItem> foodItemsList, int tableNum){
+
+    public SendData(String ip, List<FoodItem> foodItemsList, int tableNum) {
         this.ip = ip;
         this.foodItemsList = foodItemsList;
         this.tableNum = tableNum;
@@ -45,49 +62,114 @@ public class SendData{
 
         try {
             //Connect
-            String data = "{ \"tableNum\": 78}";
-            //String url = "http://localhost:8080/order";
+            String url = "http://" + ip + ":8080/order";
 
-            URL url_server = new URL("http://localhost:8080/order");
-            HttpURLConnection httpConn = (HttpURLConnection) url_server.openConnection();
-            //HttpURLConnection httpConn = (HttpURLConnection) ((new URL (url).openConnection()));
+            //Check response code from server
+            if (!checkConnection(url, 5000)) {
+                Log.d("SendData", "Error: TimedOut");
+                return false;
+            }
 
-            httpConn.setDoOutput(true);
-            httpConn.setRequestProperty("Content-Type", "application/json; charset=utf-8");
-            httpConn.setRequestProperty("Accept", "application/json");
-            httpConn.setRequestMethod("POST");
+            //Load time is too fast, user not seen it's sending. So I slow it down a little :D
+            Thread.sleep(500);
 
-            //httpConn.setDoInput(true);
-            httpConn.connect();
+            URL url_server = new URL(url);
 
-            //Write
-            OutputStream os = httpConn.getOutputStream();
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
-            writer.write(data);
-            writer.close();
-            os.close();
+            HttpClient client = new DefaultHttpClient();
+            HttpResponse response;
+            JSONObject json = new JSONObject();
 
-            Log.d("Send data", "Send to "+ip +"\t Table no." + tableNum);
-            Log.d("Send data", foodItemsList.toString());
-            Thread.sleep(2000);
+            try {
+                HttpPost post = new HttpPost(url);
+
+                StringEntity se = new StringEntity(getJSONdata().toString(), "UTF-8");
+                Log.d("json", getJSONdata().toString());
+                se.setContentType(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+
+                post.setEntity(se);
+                response = client.execute(post);
+
+                    /*Checking response */
+                if (response != null) {
+                    HttpEntity in = response.getEntity(); //Get the data in the entity
+                    String stringResponse = EntityUtils.toString(in);
+                    Log.d("SendData", "Server was respond : " + stringResponse);
+                    try {
+                        uniqueIDfromServer = Integer.parseInt(stringResponse);
+                    } catch (NumberFormatException e) {
+                        uniqueIDfromServer = -1;
+                    }
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.d("SendData", "Error");
+            }
+
+
+            Log.d("SendData", "Send to " + ip + "\t Table no." + tableNum);
+            Log.d("SendData", foodItemsList.toString());
             sendStatus = true;
-            Log.d("Thread", "true");
             return true;
 
-        } catch (InterruptedException e){
-            e.printStackTrace();
-        } catch (ProtocolException e) {
-            e.printStackTrace();
+
         } catch (MalformedURLException e) {
             e.printStackTrace();
-        } catch (IOException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
         return false;
     }
 
-    public boolean isSuccess(){
+    public boolean isSuccess() {
         return sendStatus;
+    }
+
+    public int getOrderIDfromServer() {
+        return uniqueIDfromServer;
+    }
+
+
+    public boolean checkConnection(String url, int timeout) {
+        try {
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setConnectTimeout(timeout);
+            connection.setReadTimeout(timeout);
+            connection.setRequestMethod("HEAD");
+            int responseCode = connection.getResponseCode();
+            return (200 <= responseCode && responseCode <= 399);
+        } catch (IOException exception) {
+            return false;
+        }
+    }
+
+    private JSONObject getJSONdata() {
+        JSONObject data = new JSONObject();
+        JSONArray foodOrder = new JSONArray();
+        try {
+
+            //put all foodOrder into foods
+            for (FoodItem item : foodItemsList) {
+                JSONObject foodItem = new JSONObject();
+                foodItem.put("price", item.getPrice());
+                foodItem.put("name", item.getName());
+                foodItem.put("quantity", item.getQuantity());
+                foodItem.put("id", item.getID());
+                foodItem.put("foodType", item.getStringType());
+                foodItem.put("available", item.isAvailable());
+                foodOrder.put(foodItem);
+            }
+            data.put("foods", foodOrder);
+
+            data.put("id", 0);
+            data.put("tableNum", tableNum);
+
+
+        } catch (JSONException e) {
+            Log.d("getJSONdata", "get json error");
+        }
+
+        return data;
     }
 }
