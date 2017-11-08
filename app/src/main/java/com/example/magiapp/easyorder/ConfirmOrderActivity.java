@@ -40,6 +40,8 @@ public class ConfirmOrderActivity extends AppCompatActivity {
     Button confirmOrder;
     int tableNum;
     String ipVal;
+    boolean isSucess;
+
 
 
     @Override
@@ -99,6 +101,10 @@ public class ConfirmOrderActivity extends AppCompatActivity {
     private class OnConfirmOrderClicked implements View.OnClickListener {
         @Override
         public void onClick(View v) {
+            if (isSucess) {
+                finish();
+                return;
+            }
 
             //Check if IP Address is added.
             if (ipVal == null){
@@ -133,6 +139,7 @@ public class ConfirmOrderActivity extends AppCompatActivity {
         }
     }
 
+
     /**
      * Thread task for SendData class
      * - onPreExecute > Show loading spinning dialog.
@@ -143,12 +150,15 @@ public class ConfirmOrderActivity extends AppCompatActivity {
     private class MyAsyncTask extends AsyncTask<String, List<FoodItem>, Boolean> {
 
         private ProgressDialog dialog;
+        private int uniqueIDfromServer;
+
 
         @Override
         protected Boolean doInBackground(String... params) {
             SendData sendData = new SendData(ipVal, orderList, tableNum);
-
             sendData.send();
+            isSucess = sendData.isSuccess();
+            uniqueIDfromServer = sendData.getOrderIDfromServer();
             return sendData.isSuccess();
 
         }
@@ -163,14 +173,20 @@ public class ConfirmOrderActivity extends AppCompatActivity {
         protected void onPostExecute(Boolean aBoolean) {
             dialog.dismiss();
             Log.d("dialog", "Dismiss");
-            Toast.makeText(ConfirmOrderActivity.this, "Data was sent successfully", Toast.LENGTH_SHORT).show();
+            if (isSucess) {
+                confirmOrder.setText("Close");
+                Toast.makeText(ConfirmOrderActivity.this, "Data was sent successfully. Unique ID : " + uniqueIDfromServer, Toast.LENGTH_LONG).show();
+            } else {
+                onCancelled();
+            }
 
         }
 
         @Override
         protected void onCancelled() {
+            Log.d("ConfirmOrder", "TimedOut");
             AlertDialog.Builder builder = new AlertDialog.Builder(ConfirmOrderActivity.this);
-            builder.setMessage("Error connecting to server\n (Timed out)");
+            builder.setMessage("Error connecting to server");
             builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {

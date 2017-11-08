@@ -32,4 +32,5 @@ dependencies {
     compile 'de.codecrafters.tableview:tableview:2.8.0'
     compile 'biz.kasual:materialnumberpicker:1.2.1'
     testCompile 'junit:junit:4.12'
+    compile 'org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2'
 }
