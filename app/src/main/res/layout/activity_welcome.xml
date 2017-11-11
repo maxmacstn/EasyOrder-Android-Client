@@ -42,7 +42,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
-                    android:text="Welcome to EasyOrder!" />
+                    android:textColor="#000000"
+                    android:minHeight="200dp"
+                    android:text="Welcome to EasyOrder!\nbla\nbla" />
 
 
             </LinearLayout>
