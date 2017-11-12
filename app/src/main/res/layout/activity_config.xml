@@ -34,7 +34,8 @@
         android:id="@+id/cb_rememberIP"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Remember" />
+        android:text="Remember"
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/b_connect"
@@ -63,11 +64,12 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/textView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="bottom"
         android:gravity="center|bottom"
-        android:text="EasyOrder version 1.0a | At lease network works!" />
+        android:text="@string/version" />
 
 
 </LinearLayout>

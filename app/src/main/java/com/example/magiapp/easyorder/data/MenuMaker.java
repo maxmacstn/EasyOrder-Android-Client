@@ -22,7 +22,6 @@ public final class MenuMaker {
         foodMenu.add(new FoodItem("008", "ไอศกรีมวานิลลา", 25, FoodItem.DESSERT));
         foodMenu.add(new FoodItem("009", "โค๊ก(กระป๋อง)", 25, FoodItem.BEVERAGE));
         foodMenu.add(new FoodItem("010", "ราดหน้าผักซีอิ๊ว", 25, FoodItem.MAIN_DISH));
-        foodMenu.add(new FoodItem("999", "ป้าๆ ราดหน้าจาน", 69, FoodItem.MAIN_DISH));
 
         return foodMenu;
     }

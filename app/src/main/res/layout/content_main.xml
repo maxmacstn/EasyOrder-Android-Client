@@ -9,13 +9,15 @@
     tools:showIn="@layout/activity_main"
     android:orientation="vertical">
 
-    <de.codecrafters.tableview.TableView
-        android:focusable="false"
+    <de.codecrafters.tableview.SortableTableView
         android:id="@+id/foodTable"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        app:tableView_columnCount="4" />
+        android:focusable="false"
+        app:paddingEnd="1dp"
+        app:paddingStart="1dp"
+        app:tableView_columnCount="5" />
 
     <Button
         android:id="@+id/b_submit"
@@ -29,7 +31,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Status : "
+            android:text="Server ip : "
             android:layout_gravity="bottom"/>
 
         <TextView

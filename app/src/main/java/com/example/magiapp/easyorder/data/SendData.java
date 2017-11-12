@@ -54,12 +54,6 @@ public class SendData {
 
     public boolean send() {
 
-        /*
-        @todo: Send a data to server (Por's job)
-        Implement your code here
-        Maximum time = 6000ms otherwise this function would be killed.
-         */
-
         try {
             //Connect
             String url = "http://" + ip + ":8080/order";
@@ -78,6 +72,10 @@ public class SendData {
             HttpClient client = new DefaultHttpClient();
             HttpResponse response;
             JSONObject json = new JSONObject();
+
+
+            Log.d("SendData", "Send to " + ip + "\t Table no." + tableNum);
+            Log.d("SendData", foodItemsList.toString());
 
             try {
                 HttpPost post = new HttpPost(url);
@@ -107,8 +105,6 @@ public class SendData {
             }
 
 
-            Log.d("SendData", "Send to " + ip + "\t Table no." + tableNum);
-            Log.d("SendData", foodItemsList.toString());
             sendStatus = true;
             return true;
 

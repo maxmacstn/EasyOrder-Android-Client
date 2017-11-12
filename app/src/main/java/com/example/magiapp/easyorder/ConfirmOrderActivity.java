@@ -102,6 +102,8 @@ public class ConfirmOrderActivity extends AppCompatActivity {
         @Override
         public void onClick(View v) {
             if (isSucess) {
+                Intent returnIntent = new Intent();
+                setResult(RESULT_OK, returnIntent);
                 finish();
                 return;
             }

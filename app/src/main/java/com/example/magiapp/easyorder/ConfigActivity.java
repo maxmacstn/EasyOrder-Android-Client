@@ -58,7 +58,7 @@ public class ConfigActivity extends AppCompatActivity {
         cb_remember = (CheckBox) findViewById(R.id.cb_rememberIP);
         connectButton.setOnClickListener(new connectServer());
         ipPreference = getPreferences(MODE_PRIVATE);
-        getPreference();
+        // getPreference();
 
     }
 
