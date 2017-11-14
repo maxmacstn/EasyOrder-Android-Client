@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:fitsSystemWindows="false">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/easyorder_bg" />
+
+    <ScrollView
+        android:id="@+id/welcomeScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="24dp"
+        android:paddingBottom="24dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            android:background="@drawable/round_rect_shape"
+            android:gravity="center_horizontal"
+            android:layout_gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleType="fitCenter"
+                android:src="@drawable/easy_order_banner" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:minHeight="100dp"
+                    android:textSize="20dp"
+                    android:text="Welcome to EasyOrder!"
+                    android:textColor="#000000" />
+
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_welcome_guideText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Enter server's ip to start using it!"
+                android:textAlignment="center"
+                android:textColor="#CC000000" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/et_welcome_ip_field"
+                    android:layout_width="220dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+
+                    android:layout_marginLeft="10dp"
+                    android:height="25dp"
+                    android:background="#AFFFFFFF"
+                    android:digits="0123456789."
+                    android:gravity="bottom"
+                    android:hint="xxx.xxx.xxx.xxx"
+                    android:inputType="number|numberDecimal"
+                    android:maxLength="15"
+                    android:textAlignment="center"
+                    android:textSize="20dp"
+                    android:imeOptions="actionDone" />
+
+                <Button
+                    android:id="@+id/b_welcome_Connect"
+                    android:layout_width="wrap_content"
+                    android:layout_height="37dp"
+                    android:gravity="right"
+                    android:text="Connect" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/cb_rememberIP_welcome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Remember my IP Address"
+                    android:textColor="@android:color/black"
+                    android:textSize="10dp" />
+
+
+            </LinearLayout>
+
+            <Button
+                android:layout_width="220dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Continue"
+                android:visibility="gone" />
+
+
+        </LinearLayout>
+
+
+    </ScrollView>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/version"
+        android:textSize="10dp"
+        android:textColor="#50FFFFFF"
+        android:layout_marginBottom="5dp"
+        android:gravity="bottom|center_horizontal"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+
+</RelativeLayout>

@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -28,16 +29,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.magiapp.easyorder.data.FoodItem;
+import com.example.magiapp.easyorder.data.FoodItemComparator;
 import com.example.magiapp.easyorder.data.FoodItemTableDataAdapter;
 import com.example.magiapp.easyorder.data.MenuMaker;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import biz.kasual.materialnumberpicker.MaterialNumberPicker;
+import de.codecrafters.tableview.SortableTableView;
 import de.codecrafters.tableview.TableView;
 import de.codecrafters.tableview.listeners.TableDataClickListener;
 import de.codecrafters.tableview.listeners.TableDataLongClickListener;
+import de.codecrafters.tableview.model.TableColumnDpWidthModel;
 import de.codecrafters.tableview.model.TableColumnWeightModel;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 
@@ -45,28 +50,33 @@ import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
 public class MainActivity extends AppCompatActivity {
 
 
-    TextView connectStatus;
-    TableView table;
-    FoodItemTableDataAdapter foodItemTableDataAdapter;
-    Button submit;
-    List<FoodItem> menuList;
+    private TextView connectStatus;
+    private SortableTableView table;
+    private FoodItemTableDataAdapter foodItemTableDataAdapter;
+    private Button submit;
+    private List<FoodItem> menuList;
     boolean isDialogShow = false;
     private EditText actionBarET_tableNum;
-   // private int tableNum;
+    // private int tableNum;
     private String ipVal;
     private MenuItem b_selectTableNum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         b_selectTableNum = (MenuItem) findViewById(R.id.action_ButtonSelectTableNum);
-        table = (TableView<String>) findViewById(R.id.foodTable);
+        table = (SortableTableView<String>) findViewById(R.id.foodTable);
         submit = (Button) findViewById(R.id.b_submit);
         connectStatus = (TextView) findViewById(R.id.tv_connectStatus_main);
         menuList = MenuMaker.createFoodMenuList();
         setSupportActionBar(toolbar);
+        Intent intent = getIntent();
+        ipVal = intent.getStringExtra("ipVal");
+        connectStatus.setText(ipVal);
+
         initTable();
 
         submit.setOnClickListener(new OnClickedSubmitButton());
@@ -94,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEND) {
-                    Log.d("et", "clear ");
                     actionBarET_tableNum.clearFocus();
                     InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                     in.hideSoftInputFromWindow(actionBarET_tableNum.getApplicationWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
@@ -117,11 +126,13 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            //Toast.makeText(MainActivity.this, "U just press settings button", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(MainActivity.this, ConfigActivity.class);
-            //intent.putExtra("result", ans);
             startActivityForResult(intent, 1);
+            return true;
+        }
 
+        if (id == R.id.action_resetOrder) {
+            resetTable();
             return true;
         }
 
@@ -140,18 +151,33 @@ public class MainActivity extends AppCompatActivity {
      * Initialize the Sortable table view with data from list
      */
     private void initTable() {
+
         TableColumnWeightModel columnModel = new TableColumnWeightModel(5);
-        columnModel.setColumnWeight(0, 2);
-        columnModel.setColumnWeight(1, 1);
-        columnModel.setColumnWeight(2, 4);
-        columnModel.setColumnWeight(3, 2);
-        columnModel.setColumnWeight(4, 2);
+        columnModel.setColumnWeight(0, 4);
+        columnModel.setColumnWeight(1, 3);
+        columnModel.setColumnWeight(2, 6);
+        columnModel.setColumnWeight(3, 4);
+        columnModel.setColumnWeight(4, 3);
         table.setColumnModel(columnModel);
+
+        /*
+
+        TableColumnDpWidthModel columnModel = new TableColumnDpWidthModel(MainActivity.this, 5, 200);
+        columnModel.setColumnWidth(0, 70);
+        columnModel.setColumnWidth(1, 50);
+        columnModel.setColumnWidth(2, 130);
+        columnModel.setColumnWidth(3, 65);
+        columnModel.setColumnWidth(4, 50);
+        table.setColumnModel(columnModel);
+            */
         foodItemTableDataAdapter = new FoodItemTableDataAdapter(this, menuList, table);
         table.setHeaderAdapter(new SimpleTableHeaderAdapter(this, foodItemTableDataAdapter.getHeaderData()));
         table.setDataAdapter(foodItemTableDataAdapter);
         table.addDataClickListener(new ClickedTableRow());
         table.addDataLongClickListener(new LongClickedTableRow());
+        table.setColumnComparator(0, FoodItemComparator.typeComparator);
+        table.setColumnComparator(1, FoodItemComparator.idComparator);
+        table.setColumnComparator(2, FoodItemComparator.nameComparator);
 
     }
 
@@ -161,10 +187,13 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (data == null)
             return;
-        if (requestCode == 1 || resultCode == RESULT_OK) {
+        if (requestCode == 1 && resultCode == RESULT_OK) {
             String responseText = data.getStringExtra("result");
             ipVal = responseText;
             connectStatus.setText("Connected to server at " + responseText);
+        }
+        if (requestCode == 2 && resultCode == RESULT_OK) {
+            resetTable();
         }
     }
 
@@ -284,11 +313,11 @@ public class MainActivity extends AppCompatActivity {
             }
 
             int tableNum = 0;
-            if (actionBarET_tableNum.length() != 0){
+            if (actionBarET_tableNum.length() != 0) {
                 tableNum = Integer.parseInt(actionBarET_tableNum.getText().toString());
             }
 
-            if (tableNum == 0 ) {
+            if (tableNum == 0) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setMessage("Please input table number in the top right field.");
                 builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
@@ -307,7 +336,7 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("menuList", orderList);
             intent.putExtra("tableNum", tableNum);
             intent.putExtra("ipVal", ipVal);
-            startActivity(intent);
+            startActivityForResult(intent, 2);
         }
     }
 
@@ -325,6 +354,7 @@ public class MainActivity extends AppCompatActivity {
             if (item.getQuantity() != 0)
                 orderList.add(item);
         }
+        Collections.sort(orderList, FoodItemComparator.typeComparator);
         return orderList;
     }
 
@@ -342,6 +372,33 @@ public class MainActivity extends AppCompatActivity {
         }
         foodItemTableDataAdapter.notifyDataSetChanged();
 
+    }
+
+    private void resetTable() {
+
+        for (int i = 0; i < menuList.size(); i++) {
+            menuList.get(i).setQuantity(0);
+        }
+        foodItemTableDataAdapter.notifyDataSetChanged();
+        actionBarET_tableNum.setText("");
+
+    }
+
+    /*
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("ipVal",ipVal);
+        Log.d("save ipVal",ipVal);
+
+    }
+*/
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        ipVal = savedInstanceState.getString("ipVal");
+        Log.d("restore ipVal", ipVal);
     }
 
 

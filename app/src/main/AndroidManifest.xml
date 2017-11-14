@@ -2,18 +2,37 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.magiapp.easyorder">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher_easyicon"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_easyicon"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:resizeableActivity="true">
         <activity
-            android:name="com.example.magiapp.easyorder.MainActivity"
+            android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
+        <activity android:name=".ConfigActivity" />
+        <activity
+            android:name=".ConfirmOrderActivity"
+            android:label="Confirm order"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".WelcomeActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_welcome"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait"
+            android:resizeableActivity="false"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -21,16 +40,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.example.magiapp.easyorder.ConfigActivity" />
-        <activity
-            android:name="com.example.magiapp.easyorder.ConfirmOrderActivity"
-            android:label="Confirm order"
-            android:screenOrientation="portrait" >
-        </activity>
     </application>
-
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
 
 </manifest>
