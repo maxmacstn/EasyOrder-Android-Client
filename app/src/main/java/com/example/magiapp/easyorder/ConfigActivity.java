@@ -39,6 +39,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
+
 public class ConfigActivity extends AppCompatActivity {
     Button connectButton;
     EditText ipField;
@@ -62,7 +63,10 @@ public class ConfigActivity extends AppCompatActivity {
 
     }
 
-    public class connectServer implements View.OnClickListener {
+    /**
+     * Handler for connectServer button
+     */
+    private class connectServer implements View.OnClickListener {
         @Override
         public void onClick(View v) {
             ipVal = ipField.getText().toString();
@@ -97,7 +101,13 @@ public class ConfigActivity extends AppCompatActivity {
         }
     }
 
-    public static boolean validIP(String ip) {
+    /**
+     * valid IPv4 string ex. "10.0.0.1"
+     *
+     * @param ip String of ip
+     * @return return true if valid.
+     */
+    private static boolean validIP(String ip) {
         try {
             if (ip == null || ip.isEmpty()) {
                 return false;
@@ -124,6 +134,10 @@ public class ConfigActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Do this function after checked that input ip is vaklid
+     * @param isSucess
+     */
     private void afterCheckedIP(boolean isSucess) {
         if (cb_remember.isChecked()) {
             putPreference();                                 //Save IP
@@ -138,6 +152,9 @@ public class ConfigActivity extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * Save ip value
+     */
     private void putPreference() {
         String ip = ipField.getText().toString();
         Boolean isChecked = cb_remember.isChecked();
@@ -148,6 +165,10 @@ public class ConfigActivity extends AppCompatActivity {
         editor.apply();
     }
 
+    /**
+     * Get ip value
+     * (Obsolete)
+     */
     private void getPreference() {
         if (ipPreference.contains("pref_ip"))
             ipField.setText(ipPreference.getString("pref_ip", ""));
@@ -203,7 +224,11 @@ public class ConfigActivity extends AppCompatActivity {
         }
     }
 
-    public class TestConnect {
+
+    /**
+     * Test connect to server
+     */
+    private class TestConnect {
         private String ip;
         private boolean sendStatus = false;
 
@@ -215,7 +240,7 @@ public class ConfigActivity extends AppCompatActivity {
         public boolean send() {
             try {
                 //Connect
-                String url = "http://" + ip + ":8080/order";
+                String url = "http://" + ip + ":8080/order/test";
 
                 //Check response code from server
                 if (!checkConnection(url, 5000)) {

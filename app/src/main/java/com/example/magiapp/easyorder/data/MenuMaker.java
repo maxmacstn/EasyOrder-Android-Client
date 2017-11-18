@@ -11,18 +11,18 @@ public final class MenuMaker {
     public static List<FoodItem> createFoodMenuList() {
 
         List<FoodItem> foodMenu = new ArrayList<>();
-
-        foodMenu.add(new FoodItem("001", "Fried Rice", 25, FoodItem.MAIN_DISH));
-        foodMenu.add(new FoodItem("002", "Omelette", 35.5, FoodItem.MAIN_DISH));
-        foodMenu.add(new FoodItem("003", "Green Tea", 25, FoodItem.BEVERAGE));
-        foodMenu.add(new FoodItem("004", "Pudding", 25, FoodItem.DESSERT));
-        foodMenu.add(new FoodItem("005", "Miso Soup", 25, FoodItem.SOUP));
-        foodMenu.add(new FoodItem("006", "ไก่ผัดพริก", 30, FoodItem.MAIN_DISH));
-        foodMenu.add(new FoodItem("007", "หมูทอดกระเทียม", 25, FoodItem.MAIN_DISH));
-        foodMenu.add(new FoodItem("008", "ไอศกรีมวานิลลา", 25, FoodItem.DESSERT));
-        foodMenu.add(new FoodItem("009", "โค๊ก(กระป๋อง)", 25, FoodItem.BEVERAGE));
-        foodMenu.add(new FoodItem("010", "ราดหน้าผักซีอิ๊ว", 25, FoodItem.MAIN_DISH));
-
+/*
+        foodMenu.add(new FoodItem(1, "Fried Rice", 25, FoodItem.MAIN_DISH));
+        foodMenu.add(new FoodItem(2, "Omelette", 35.5, FoodItem.MAIN_DISH));
+        foodMenu.add(new FoodItem(3, "Green Tea", 25, FoodItem.BEVERAGE));
+        foodMenu.add(new FoodItem(4, "Pudding", 25, FoodItem.DESSERT));
+        foodMenu.add(new FoodItem(5, "Miso Soup", 25, FoodItem.SOUP));
+        foodMenu.add(new FoodItem(6, "ไก่ผัดพริก", 30, FoodItem.MAIN_DISH));
+        foodMenu.add(new FoodItem(7, "หมูทอดกระเทียม", 25, FoodItem.MAIN_DISH));
+        foodMenu.add(new FoodItem(8, "ไอศกรีมวานิลลา", 25, FoodItem.DESSERT));
+        foodMenu.add(new FoodItem(9, "โค๊ก(กระป๋อง)", 25, FoodItem.BEVERAGE));
+        foodMenu.add(new FoodItem(10, "ราดหน้าผักซีอิ๊ว", 25, FoodItem.MAIN_DISH));
+*/
         return foodMenu;
     }
 

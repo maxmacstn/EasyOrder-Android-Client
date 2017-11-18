@@ -1,35 +1,57 @@
 package com.example.magiapp.easyorder.data;
 
+import android.util.Log;
+
 import com.example.magiapp.easyorder.R;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
 
 /**
+ * Food Item object for storing single food item.
  * Created by MaxMac on 27-Oct-17.
  */
 
-public class FoodItem implements Serializable{
+
+public class FoodItem implements Serializable {
     private double price;
     private String name;
     private int quantity = 0;
     private boolean isAvailable = true;
-    private String id;
-    private int type;
-    public static final int MAIN_DISH = 1;
-    public static final int SOUP = 2;
-    public static final int BEVERAGE = 3;
-    public static final int DESSERT = 4;
+    private int id;
+    private FoodType foodType;
 
-    public FoodItem(String id, String name, double price, int type) {
+    public FoodItem(int id, String name, double price, FoodType type) {
         this.price = price;
         this.name = name;
-        this.type = type;
+        this.foodType = type;
         this.id = id;
+    }
+
+
+    private int getTypeByString(String type) {
+        switch (type) {
+            case "MAIN_DISH":
+                return 1;
+            case "SOUP":
+                return 2;
+            case "BEVERAGE":
+                return 3;
+            case "DESSERT":
+                return 4;
+            default:
+                return 0;
+
+        }
     }
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+
+    public void setFoodType(FoodType type) {
+        foodType = type;
     }
 
     public double getPrice() {
@@ -49,45 +71,40 @@ public class FoodItem implements Serializable{
     }
 
     public int getType() {
-        return type;
+        return foodType.ordinal() + 1;
     }
 
-    public String getStringType() {
-        switch (type) {
-            case 1:
-                return "MAIN_DISH";
-            case 2:
-                return "SOUP";
-            case 3:
-                return "BEVERAGE";
-            case 4:
-                return "DESSERT";
-            default:
-                return null;
-        }
+    public FoodType getEnumType() {
+        return foodType;
     }
 
-
-
+    /**
+     * Get logo location for using as symbol in TableView
+     *
+     * @return resource data of type symbol.
+     */
     public int getLogo() {
-        switch (type){
-            case 1:
+        switch (foodType) {
+            case MAIN_DISH:
                 return R.drawable.rice;
-            case 2:
+            case SOUP:
                 return R.drawable.soup;
-            case 3:
+            case BEVERAGE:
                 return R.drawable.beverage;
-            case 4:
+            case DESSERT:
                 return R.drawable.dessert;
         }
         return R.mipmap.ic_launcher;
     }
 
-    public String getID(){return id;}
+
+    public int getID() {
+        return id;
+    }
 
 
     @Override
     public String toString() {
-        return String.format("\n%-5s %-15s %.2f฿   qty= %d",id,name,price,quantity);
+        return String.format("\nType:%s id:%02d price:%-15s qty:%.2f฿   qty= %d", foodType.toString(), id, name, price, quantity);
     }
 }
