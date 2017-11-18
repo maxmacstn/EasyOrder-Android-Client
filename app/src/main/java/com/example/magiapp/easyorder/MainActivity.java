@@ -1,13 +1,16 @@
 package com.example.magiapp.easyorder;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
@@ -25,6 +28,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,7 +36,18 @@ import com.example.magiapp.easyorder.data.FoodItem;
 import com.example.magiapp.easyorder.data.FoodItemComparator;
 import com.example.magiapp.easyorder.data.FoodItemTableDataAdapter;
 import com.example.magiapp.easyorder.data.MenuMaker;
+import com.google.gson.Gson;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,6 +60,7 @@ import de.codecrafters.tableview.listeners.TableDataLongClickListener;
 import de.codecrafters.tableview.model.TableColumnDpWidthModel;
 import de.codecrafters.tableview.model.TableColumnWeightModel;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
+import jp.wasabeef.blurry.Blurry;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -57,34 +73,38 @@ public class MainActivity extends AppCompatActivity {
     private List<FoodItem> menuList;
     boolean isDialogShow = false;
     private EditText actionBarET_tableNum;
-    // private int tableNum;
     private String ipVal;
     private MenuItem b_selectTableNum;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        // getActionBar().setIcon(R.drawable.easy_order_title_banner);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         b_selectTableNum = (MenuItem) findViewById(R.id.action_ButtonSelectTableNum);
         table = (SortableTableView<String>) findViewById(R.id.foodTable);
         submit = (Button) findViewById(R.id.b_submit);
         connectStatus = (TextView) findViewById(R.id.tv_connectStatus_main);
-        menuList = MenuMaker.createFoodMenuList();
         setSupportActionBar(toolbar);
         Intent intent = getIntent();
         ipVal = intent.getStringExtra("ipVal");
         connectStatus.setText(ipVal);
-
+        menuList = new ArrayList<>();
         initTable();
+        updateTableMenu();
+
 
         submit.setOnClickListener(new OnClickedSubmitButton());
-        autoInitRandomOrder();
+        //  autoInitRandomOrder();
 
     }
 
     @Override
+    /**
+     * Init ActionBar to contain OptionMenu.
+     * Create TableNum entry and TableNum Button.
+     */
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -100,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
         et_tableNum.setFilters(new InputFilter[]{new InputFilter.LengthFilter(2)});
 
         this.actionBarET_tableNum = et_tableNum;
+
         actionBarET_tableNum.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -118,10 +139,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    /**
+     * Handle action bar item clicks here. The action bar will
+     * automatically handle clicks on the Home/Up button, so long
+     * as you specify a parent activity in AndroidManifest.xml.
+     */
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -142,6 +166,8 @@ public class MainActivity extends AppCompatActivity {
             imm.showSoftInput(actionBarET_tableNum, InputMethodManager.SHOW_IMPLICIT);
             return true;
         }
+        if (id == R.id.action_refreshList)
+            updateTableMenu();
 
 
         return super.onOptionsItemSelected(item);
@@ -152,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void initTable() {
 
+        //Set the width of the table.
         TableColumnWeightModel columnModel = new TableColumnWeightModel(5);
         columnModel.setColumnWeight(0, 4);
         columnModel.setColumnWeight(1, 3);
@@ -160,16 +187,7 @@ public class MainActivity extends AppCompatActivity {
         columnModel.setColumnWeight(4, 3);
         table.setColumnModel(columnModel);
 
-        /*
-
-        TableColumnDpWidthModel columnModel = new TableColumnDpWidthModel(MainActivity.this, 5, 200);
-        columnModel.setColumnWidth(0, 70);
-        columnModel.setColumnWidth(1, 50);
-        columnModel.setColumnWidth(2, 130);
-        columnModel.setColumnWidth(3, 65);
-        columnModel.setColumnWidth(4, 50);
-        table.setColumnModel(columnModel);
-            */
+        //Add option to table.
         foodItemTableDataAdapter = new FoodItemTableDataAdapter(this, menuList, table);
         table.setHeaderAdapter(new SimpleTableHeaderAdapter(this, foodItemTableDataAdapter.getHeaderData()));
         table.setDataAdapter(foodItemTableDataAdapter);
@@ -183,6 +201,9 @@ public class MainActivity extends AppCompatActivity {
 
 
     @Override
+    /**
+     * Get result from returned activity.
+     */
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (data == null)
@@ -190,7 +211,8 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == 1 && resultCode == RESULT_OK) {
             String responseText = data.getStringExtra("result");
             ipVal = responseText;
-            connectStatus.setText("Connected to server at " + responseText);
+            connectStatus.setText(responseText);
+            updateTableMenu();
         }
         if (requestCode == 2 && resultCode == RESULT_OK) {
             resetTable();
@@ -374,6 +396,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Reset table quantity to 0 for all row.
+     * Set action bar table number field to blank.
+     */
     private void resetTable() {
 
         for (int i = 0; i < menuList.size(); i++) {
@@ -385,21 +411,151 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /*
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString("ipVal",ipVal);
-        Log.d("save ipVal",ipVal);
-
-    }
-*/
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         ipVal = savedInstanceState.getString("ipVal");
         Log.d("restore ipVal", ipVal);
     }
+    */
+
+    /**
+     * Update the table by getting menuList from the server.
+     */
+    private void updateTableMenu() {
+        MenuDownloader menuDownloader = new MenuDownloader();
+        menuDownloader.execute(ipVal);
+    }
+
+    /**
+     * This class download the menuList from the server.
+     * url of the server that want to connect.
+     */
+    private class MenuDownloader extends AsyncTask<String, String, String> {
+        private ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
+        private String output;
+        private boolean isSuccess = false;
+
+        @Override
+        protected void onPreExecute() {
+            progressDialog.setMessage("Downloading menu data...");
+            progressDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            HttpURLConnection connection = null;
+            BufferedReader reader = null;
 
 
+            try {
+                URL url = new URL("http://" + params[0] + ":8080/food");
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setConnectTimeout(2000);
+                connection.connect();
+
+
+                InputStream stream = connection.getInputStream();
+
+                reader = new BufferedReader(new InputStreamReader(stream));
+
+                StringBuffer buffer = new StringBuffer();
+                String line = "";
+
+                while ((line = reader.readLine()) != null) {
+                    buffer.append(line + "\n");
+                    Log.d("Response: ", "> " + line);   //here u ll get whole response...... :-)
+
+                }
+
+                //output = json from server that converted to String
+                output = buffer.toString();
+                isSuccess = true;
+                Thread.sleep(500);
+
+                return output;
+
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+                try {
+                    if (reader != null) {
+                        reader.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            progressDialog.dismiss();
+
+
+            //if not success, show the dialog and go back to WelcomeActivity
+            if (!isSuccess) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setMessage("Error while getting menu data from server :(");
+                builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(MainActivity.this, WelcomeActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+                builder.show();
+                return;
+            }
+
+            Log.d("GetJSONMenu", output);
+
+
+            //Convert String to JSONArray and use Gson Library to menuList List.
+            JSONArray array = null;
+            try {
+                array = new JSONArray(output);
+                menuList.clear();
+
+                if (array.length() > 0) {
+                    Gson gson = new Gson();
+                    int i = 0;
+                    while (i < array.length()) {
+                        menuList.add(gson.fromJson(array.getJSONObject(i).toString(), FoodItem.class));
+                        i++;
+                    }
+                } else {
+                    //if no foodItem object from server
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setMessage("There are no food in menu :(");
+                    builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Intent intent = new Intent(MainActivity.this, WelcomeActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    });
+                    builder.show();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            Log.d("MenuList", menuList.toString());
+            foodItemTableDataAdapter.notifyDataSetChanged();
+        }
+    }
 }

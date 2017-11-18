@@ -23,7 +23,9 @@ import java.util.List;
 
 import static java.lang.String.format;
 
-
+/**
+ * Adaptor for FoodItem object for using with TableView
+ */
 public class FoodItemTableDataAdapter extends TableDataAdapter<FoodItem> {
 
     private static final int TEXT_SIZE = 14;
@@ -45,7 +47,7 @@ public class FoodItemTableDataAdapter extends TableDataAdapter<FoodItem> {
                 renderedView = renderFoodTypeIcon(foodItem, parentView);
                 break;
             case 1:
-                renderedView = renderString(foodItem.getID());
+                renderedView = renderString(String.format("%02d", foodItem.getID()));
                 break;
             case 2:
                 renderedView = renderString(foodItem.getName());
@@ -69,7 +71,6 @@ public class FoodItemTableDataAdapter extends TableDataAdapter<FoodItem> {
         textView.setText(priceString);
         textView.setPadding(20, 10, 20, 10);
         textView.setTextSize(TEXT_SIZE);
-
 
         return textView;
     }

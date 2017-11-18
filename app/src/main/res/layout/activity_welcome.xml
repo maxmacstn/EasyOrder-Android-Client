@@ -6,6 +6,7 @@
     android:fitsSystemWindows="false">
 
     <ImageView
+        android:id="@+id/im_welcome_bg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
@@ -31,7 +32,8 @@
             android:background="@drawable/round_rect_shape"
             android:gravity="center_horizontal"
             android:layout_gravity="center_horizontal"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:id="@+id/ll_welcome">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -88,7 +90,8 @@
                     android:maxLength="15"
                     android:textAlignment="center"
                     android:textSize="20dp"
-                    android:imeOptions="actionDone" />
+                    android:imeOptions="actionDone"
+                    android:focusable="true" />
 
                 <Button
                     android:id="@+id/b_welcome_Connect"
@@ -136,7 +139,6 @@
         android:text="@string/version"
         android:textSize="10dp"
         android:textColor="#50FFFFFF"
-        android:layout_marginBottom="5dp"
         android:gravity="bottom|center_horizontal"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"

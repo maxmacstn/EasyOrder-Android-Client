@@ -35,9 +35,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
+ * Send order data to server
+ * This class must run in separated thread.
  * Created by MaxMac on 30-Oct-17.
  */
-
 public class SendData {
     private String ip;
     private List<FoodItem> foodItemsList;
@@ -45,21 +46,29 @@ public class SendData {
     private int tableNum;
     private int uniqueIDfromServer;
 
-
+    /**
+     * @param ip            ip of the server.
+     * @param foodItemsList List of food order List.
+     * @param tableNum      order table number.
+     */
     public SendData(String ip, List<FoodItem> foodItemsList, int tableNum) {
         this.ip = ip;
         this.foodItemsList = foodItemsList;
         this.tableNum = tableNum;
     }
 
+    /**
+     * Send data to the server
+     * @return return true if success.
+     */
     public boolean send() {
 
         try {
             //Connect
-            String url = "http://" + ip + ":8080/order";
+            String url = "http://" + ip + ":8080";
 
             //Check response code from server
-            if (!checkConnection(url, 5000)) {
+            if (!checkConnection(url + "/order/test", 5000)) {
                 Log.d("SendData", "Error: TimedOut");
                 return false;
             }
@@ -67,7 +76,7 @@ public class SendData {
             //Load time is too fast, user not seen it's sending. So I slow it down a little :D
             Thread.sleep(500);
 
-            URL url_server = new URL(url);
+
 
             HttpClient client = new DefaultHttpClient();
             HttpResponse response;
@@ -78,7 +87,7 @@ public class SendData {
             Log.d("SendData", foodItemsList.toString());
 
             try {
-                HttpPost post = new HttpPost(url);
+                HttpPost post = new HttpPost(url + "/order");
 
                 StringEntity se = new StringEntity(getJSONdata().toString(), "UTF-8");
                 Log.d("json", getJSONdata().toString());
@@ -109,8 +118,7 @@ public class SendData {
             return true;
 
 
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -126,20 +134,31 @@ public class SendData {
         return uniqueIDfromServer;
     }
 
-
-    public boolean checkConnection(String url, int timeout) {
+    /**
+     * Check the connection from server.
+     *
+     * @param url     url of the server.
+     * @param timeout connection timedout.
+     * @return return false if response code is not valid or cannot connect to server.
+     */
+    private boolean checkConnection(String url, int timeout) {
         try {
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setConnectTimeout(timeout);
             connection.setReadTimeout(timeout);
             connection.setRequestMethod("HEAD");
             int responseCode = connection.getResponseCode();
+            Log.d("CheckConnection", "Server response code: " + responseCode);
             return (200 <= responseCode && responseCode <= 399);
         } catch (IOException exception) {
             return false;
         }
     }
 
+    /**
+     * get JSONdata from foodItemList
+     * @return JSON Object of the foodItemList.
+     */
     private JSONObject getJSONdata() {
         JSONObject data = new JSONObject();
         JSONArray foodOrder = new JSONArray();
@@ -152,11 +171,12 @@ public class SendData {
                 foodItem.put("name", item.getName());
                 foodItem.put("quantity", item.getQuantity());
                 foodItem.put("id", item.getID());
-                foodItem.put("foodType", item.getStringType());
-                foodItem.put("available", item.isAvailable());
+                foodItem.put("foodType", item.getEnumType());
+                //  foodItem.put("available", item.isAvailable());
                 foodOrder.put(foodItem);
             }
-            data.put("foods", foodOrder);
+            //data.put("foods", foodOrder);
+            data.put("foodItems", foodOrder);
 
             data.put("id", 0);
             data.put("tableNum", tableNum);

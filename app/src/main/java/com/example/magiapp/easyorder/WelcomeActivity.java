@@ -23,6 +23,8 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,6 +36,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
+import jp.wasabeef.blurry.Blurry;
+
 
 public class WelcomeActivity extends AppCompatActivity {
     private EditText ipField;
@@ -42,6 +46,8 @@ public class WelcomeActivity extends AppCompatActivity {
     private SharedPreferences ipPreference;
     private CheckBox cb_remember;
     private ScrollView scrollView;
+    //private LinearLayout linearLayout;
+    //private ImageView bgImage;
 
 
     @Override
@@ -56,6 +62,7 @@ public class WelcomeActivity extends AppCompatActivity {
         connect = (Button) findViewById(R.id.b_welcome_Connect);
         scrollView = (ScrollView) findViewById(R.id.welcomeScrollView);
         cb_remember = (CheckBox) findViewById(R.id.cb_rememberIP_welcome);
+        //bgImage = (ImageView) findViewById(R.id.im_welcome_bg);
         connect.setOnClickListener(new OnConnectButtonClicked());
         ipPreference = getPreferences(MODE_PRIVATE);
         getPreference();
@@ -70,8 +77,18 @@ public class WelcomeActivity extends AppCompatActivity {
             }
         });
 
-
+        //linearLayout = (LinearLayout) findViewById(R.id.ll_welcome);
+        /*
+        Blurry.with(WelcomeActivity.this)
+                .radius(50)
+                .sampling(8)
+                .color(Color.argb(66, 255, 255, 0))
+                .async()
+                .animate(100)
+                .onto(linearLayout);
+                */
     }
+
 
     private class OnConnectButtonClicked implements View.OnClickListener {
         @Override
@@ -82,6 +99,11 @@ public class WelcomeActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Try to connect to server to see weather the ip is valid or not
+     *
+     * @return true if can connect
+     */
     private boolean connectTo() {
         String ipInput = ipField.getText().toString();
 
@@ -109,7 +131,11 @@ public class WelcomeActivity extends AppCompatActivity {
         }
     }
 
-
+    /**
+     * valid IPv4 string ex. "10.0.0.1"
+     * @param ip String of ip
+     * @return return true if valid.
+     */
     private static boolean validIP(String ip) {
         try {
             if (ip == null || ip.isEmpty()) {
@@ -137,7 +163,14 @@ public class WelcomeActivity extends AppCompatActivity {
         }
     }
 
-    private void afterCheckedIP(boolean isSucess) {
+    /**
+     * do the following function after checked and ip is valid.
+     * Check that user want to remember ip or not
+     * start MainActivity and put ip as Intent.
+     *
+     * @param isSuccess is validation process is success or not
+     */
+    private void afterCheckedIP(boolean isSuccess) {
 
         if (cb_remember.isChecked()) {
             putPreference();                                 //Save IP
@@ -158,6 +191,10 @@ public class WelcomeActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Connect to server thread class.
+     *
+     */
     private class MyAsyncTask extends AsyncTask<String, List<FoodItem>, Boolean> {
 
         private ProgressDialog dialog;
@@ -195,10 +232,15 @@ public class WelcomeActivity extends AppCompatActivity {
 
         @Override
         protected void onCancelled() {
-            dialog.dismiss();
-            afterCheckedIP(true);           //debug
-            return;
+
+            //For debug purpose, can enter activity with wrong IP address.
             /*
+            dialog.dismiss();
+            afterCheckedIP(true);
+            return;
+            */
+
+
             AlertDialog.Builder builder = new AlertDialog.Builder(WelcomeActivity.this);
             builder.setMessage("Error connecting to server");
             builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
@@ -211,12 +253,15 @@ public class WelcomeActivity extends AppCompatActivity {
             builder.show();
             guideText.setText("Connection failed");
             guideText.setTextColor(Color.RED);
-            */
+
         }
 
     }
 
-    public class TestConnect {
+    /**
+     * Test connect to server.
+     */
+    private class TestConnect {
         private String ip;
         private boolean sendStatus = false;
 
@@ -228,7 +273,7 @@ public class WelcomeActivity extends AppCompatActivity {
         public boolean send() {
             try {
                 //Connect
-                String url = "http://" + ip + ":8080/order";
+                String url = "http://" + ip + ":8080/order/test";
 
                 //Check response code from server
                 if (!checkConnection(url, 5000)) {
@@ -264,6 +309,9 @@ public class WelcomeActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * save ip value
+     */
     private void putPreference() {
         String ip = ipField.getText().toString();
         Boolean isChecked = cb_remember.isChecked();
@@ -274,6 +322,9 @@ public class WelcomeActivity extends AppCompatActivity {
         editor.apply();
     }
 
+    /**
+     * get saved ip value.
+     */
     private void getPreference() {
         if (ipPreference.contains("pref_ip"))
             ipField.setText(ipPreference.getString("pref_ip", ""));

@@ -20,6 +20,10 @@
         android:orderInCategory="100"
         android:title="@string/action_settings" />
     <item
+        android:id="@+id/action_refreshList"
+        android:orderInCategory="100"
+        android:title="Refresh menu list" />
+    <item
         android:id="@+id/action_resetOrder"
         android:orderInCategory="100"
         android:title="Reset order" />
