@@ -2,11 +2,17 @@
 
 
 
-# EasyOrder
-An easy food ordering app for restaurant
+# EasyOrder - Android Client
+An android app client application for EasyOrder project which includes Server and Dashboard
 
-## What is Easyorder?
-Well, just another n00b android apps.
+# What is EasyOrder?
+This project aims to create both client and server application to help restaurant employees keep track of their order. We also provide a dashboard that can be used by employees and customers alike.
+
+## Features
+- Welcome screen for users to enter server's IP address before using it.
+- Menu of the food can automatically fetch from server.
+- Table view for browsing the menu and select the food.
+
 
 ## Developer
 - Sitinut Waisara - Android native app developer
@@ -15,10 +21,10 @@ Well, just another n00b android apps.
 
 ## Parts of project
 - Android client app (this github)
-- [Server](https://github.com/coregameHD/EasyOrderDashboard)
-- [Dashboard](https://github.com/EnviableYapper0/EasyOrderServer)
+- [Server](https://github.com/coregameHD/EasyOrderDashboard) - Store the Menu Database and manage all of the order information
+- [Dashboard](https://github.com/EnviableYapper0/EasyOrderServer) - Show the order data from the database and it can remove the order after food making process was done.
 
-##Dependencies
+## Dependencies
 - [SortableTableView](https://github.com/ISchwarz23/SortableTableView)
 - [MaterialNumberPicker](https://github.com/KasualBusiness/MaterialNumberPicker)
 - HttpClient
