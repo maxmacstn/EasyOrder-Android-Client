@@ -36,7 +36,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
-import jp.wasabeef.blurry.Blurry;
 
 
 public class WelcomeActivity extends AppCompatActivity {
@@ -77,16 +76,6 @@ public class WelcomeActivity extends AppCompatActivity {
             }
         });
 
-        //linearLayout = (LinearLayout) findViewById(R.id.ll_welcome);
-        /*
-        Blurry.with(WelcomeActivity.this)
-                .radius(50)
-                .sampling(8)
-                .color(Color.argb(66, 255, 255, 0))
-                .async()
-                .animate(100)
-                .onto(linearLayout);
-                */
     }
 
 
