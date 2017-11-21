@@ -22,7 +22,7 @@ This project aims to create both client and server application to help restauran
 ## Parts of project
 - Android client app (this github page)
 - [Server](https://github.com/coregameHD/EasyOrderDashboard) - Store the Menu Database and manage all of the order information
-- [Dashboard](https://github.com/EnviableYapper0/EasyOrderServer) - Show the order data from the database and it can remove the order after food making process was done.
+- [Dashboard](https://github.com/coregameHD/EasyOrderDashboard) - Show the order data from the database and it can remove the order after food making process was done.
 
 ## Dependencies
 - [SortableTableView](https://github.com/ISchwarz23/SortableTableView)
