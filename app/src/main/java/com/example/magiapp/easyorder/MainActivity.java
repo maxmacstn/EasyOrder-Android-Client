@@ -8,9 +8,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputFilter;
@@ -22,21 +20,18 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.magiapp.easyorder.data.FoodItem;
 import com.example.magiapp.easyorder.data.FoodItemComparator;
 import com.example.magiapp.easyorder.data.FoodItemTableDataAdapter;
-import com.example.magiapp.easyorder.data.MenuMaker;
 import com.google.gson.Gson;
+import com.tooltip.Tooltip;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,13 +49,11 @@ import java.util.List;
 
 import biz.kasual.materialnumberpicker.MaterialNumberPicker;
 import de.codecrafters.tableview.SortableTableView;
-import de.codecrafters.tableview.TableView;
 import de.codecrafters.tableview.listeners.TableDataClickListener;
 import de.codecrafters.tableview.listeners.TableDataLongClickListener;
-import de.codecrafters.tableview.model.TableColumnDpWidthModel;
 import de.codecrafters.tableview.model.TableColumnWeightModel;
 import de.codecrafters.tableview.toolkit.SimpleTableHeaderAdapter;
-import jp.wasabeef.blurry.Blurry;
+
 
 
 public class MainActivity extends AppCompatActivity {
@@ -134,6 +127,17 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
+
+
+        Tooltip tooltip = new Tooltip.Builder(actionBarET_tableNum)
+                .setText("Enter table number here.")
+                .setCancelable(true)
+                //   .setBackgroundColor(Color.parseColor("#A0009688"))
+                .setBackgroundColor(Color.parseColor("#CCFFFFFF"))
+                .setTextColor(Color.parseColor("#00665c"))
+                .setCornerRadius(R.dimen.default_tooltip_padding)
+                .show();
+
 
         return true;
     }
@@ -345,10 +349,19 @@ public class MainActivity extends AppCompatActivity {
                 builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //dialog.dismiss();
+                        Tooltip tooltip = new Tooltip.Builder(actionBarET_tableNum)
+                                .setText("Enter table number here.")
+                                .setCancelable(true)
+                                //   .setBackgroundColor(Color.parseColor("#A0009688"))
+                                .setBackgroundColor(Color.parseColor("#CCFFFFFF"))
+                                .setTextColor(Color.parseColor("#00665c"))
+                                .setCornerRadius(R.dimen.default_tooltip_padding)
+                                .show();
                     }
                 });
                 builder.show();
+
+
                 return;
             }
 
@@ -558,4 +571,5 @@ public class MainActivity extends AppCompatActivity {
             foodItemTableDataAdapter.notifyDataSetChanged();
         }
     }
+
 }

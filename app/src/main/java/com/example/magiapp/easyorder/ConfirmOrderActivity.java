@@ -125,7 +125,7 @@ public class ConfirmOrderActivity extends AppCompatActivity {
 
             //Start networking thread.
             final MyAsyncTask task = new MyAsyncTask();
-            task.execute("127.0.0.1");                               //I still donno what is the arg in this line
+            task.execute(ipVal);
 
             Handler handler = new Handler();
             handler.postDelayed(new Runnable()
@@ -157,7 +157,7 @@ public class ConfirmOrderActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(String... params) {
-            SendData sendData = new SendData(ipVal, orderList, tableNum);
+            SendData sendData = new SendData(params[0], orderList, tableNum);
             sendData.send();
             isSucess = sendData.isSuccess();
             uniqueIDfromServer = sendData.getOrderIDfromServer();
